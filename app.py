@@ -25,6 +25,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+user_id = "12345"
 
 
 @app.get("/")
