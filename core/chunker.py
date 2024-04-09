@@ -21,7 +21,7 @@ def get_pdf_chunks_from_url(path):
         'page_content':cleaned_text,
         
         'metadata':data[0].metadata,
-        'chunks':chunks
+        'chunks':[chunk.page_content for chunk in chunks]
             }
 
 def clean_text(doc):
@@ -42,5 +42,8 @@ def chunk_text(doc):
     chunks = text_splitter.create_documents([doc])
     return chunks
 
-chunks=getChunksFromFiles("https://www.pdpc.gov.sg/-/media/Files/PDPC/PDF-Files/Resource-for-Organisation/AI/SGModelAIGovFramework2.pdf")
-print(chunks)
+# chunks=getChunksFromFiles("https://www.pdpc.gov.sg/-/media/Files/PDPC/PDF-Files/Resource-for-Organisation/AI/SGModelAIGovFramework2.pdf")
+# cs=chunks['chunks']
+# print(cs[0])
+# print(type(cs))
+# print(type(cs[0]))
