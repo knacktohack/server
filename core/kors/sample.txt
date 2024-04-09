@@ -40,9 +40,7 @@ IV. Physical security requirements It is strongly discouraged to use any devices
 work-related tasks using a public internet connection.
 
 
-Employees must immediately report any lost or stolen devices that had access to the
-company's system or contained any of the company's information (privately-owned or
-not).
+Employees must immediately report any lost or stolen devices that had access to the company's system or contained any of the company's information (privately-owned or not).
 
 
 Employees must ensure the physical security of their devices and ensure that
@@ -80,9 +78,7 @@ solution provided by the company is OpenVPN.
 
 
 
-VI. Endpoint security Software must be installed only from official and trusted vendors. It is prohibited to
-install cracked or pirated software as it is both illegal and extremely dangerous for the
-entire infrastructure of the company.
+VI. Endpoint security Software must be installed only from official and trusted vendors. It is prohibited to install cracked or pirated software as it is both illegal and extremely dangerous for the entire infrastructure of the company.
 
 
 Employees shall uninstall old or unnecessary applications. Otherwise these applications
@@ -106,8 +102,7 @@ to the gravity of the offense committed.
 reasonable explanation for why the exception is needed.
 
 
-The policy and its requirements shall be applied in a non-discriminatory manner by all
-employees of the company.
+The policy and its requirements shall be applied in a non-discriminatory manner by all employees of the company.
 
 
 The policy will be revised and updated if needed every year or every time a change is

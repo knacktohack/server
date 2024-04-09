@@ -13,8 +13,10 @@
 # pc = Pinecone(api_key="")
 # index = pc.Index("test")
 
-from core.kors.question_extractor import QuestionExtractor
-
+from core.semantic_router.create_index import createIndex
+from core.semantic_router.utils import insertRoute,deleteAll
+from core.question_generation.question_generator import QuestionGenerator
+from core.integration.process_chunk import processChunk
 # print(pc.describe_index("test"))
 
 # res = index.upsert(vectors=[
@@ -58,7 +60,11 @@ from core.kors.question_extractor import QuestionExtractor
 # print([v["metadata"]["text"] for v in res["matches"]])
 
 if __name__ == "__main__":
-    #take input considering newlines
-    input = input("Enter the text: ")
-    questions = QuestionExtractor.extract_questions(input)
-    print(questions)
+    # take input considering newlines
+    # input = input("Enter the text: ")
+    # # #extract questions
+    # # output = QuestionGenerator.generateQuestions(input)
+    # # print(output)
+    # processChunk(input)
+    deleteAll()
+    # insertRoute("test", ["hello", "world"])

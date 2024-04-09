@@ -16,15 +16,15 @@ h11==0.14.0
 idna==3.6
 jsonpatch==1.33
 jsonpointer==2.4
-langchain==0.0.177
-langchain-community==0.0.31
+langchain
+langchain-community
 langchain-core==0.1.40
 langchain-text-splitters==0.0.1
 langsmith==0.1.40
 marshmallow==3.21.1
 multidict==6.0.5
 mypy-extensions==1.0.0
-numpy==1.24.4
+numpy
 orjson==3.10.0
 packaging==23.2
 pydantic
@@ -43,3 +43,4 @@ uvicorn==0.29.0
 yarl==1.9.4
 kor
 openai
+semantic-router[pinecone]==0.0.32

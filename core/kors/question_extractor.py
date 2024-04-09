@@ -30,6 +30,6 @@ class QuestionExtractor:
     chain = create_extraction_chain(llm, schema,encoder_or_encoder_class="JSON",input_formatter="triple_quotes")
     
     @staticmethod
-    def extract_questions(text: str):
-        return QuestionExtractor.chain.predict_and_parse(text = text)['data']
+    def extractQuestions(text: str):
+        return QuestionExtractor.chain.predict(text = text)['data']
 
