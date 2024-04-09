@@ -39,5 +39,8 @@ def chunk_text(doc):
     length_function=len,
     is_separator_regex=False,
 )
-    chunks = text_splitter.create_documents(doc)
+    chunks = text_splitter.create_documents([doc])
     return chunks
+
+chunks=getChunksFromFiles("https://www.pdpc.gov.sg/-/media/Files/PDPC/PDF-Files/Resource-for-Organisation/AI/SGModelAIGovFramework2.pdf")
+print(chunks)
