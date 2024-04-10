@@ -18,7 +18,7 @@
 from core.question_generation.question_generator import QuestionGenerator
 # from core.integration.pinecone_integration import PineConeIntegration
 # from core.chunker import getChunksFromFiles
-# from core.kors.question_extractor import QuestionExtractor
+from core.kors.question_extractor import QuestionExtractor
 from core.rag.utils import RagIntegration
 
 # print(pc.describe_index("test"))
@@ -82,5 +82,5 @@ if __name__ == "__main__":
     # insertRoute("test", ["hello", "world"])
     text = input("Enter the text: ")
     # RagIntegration.addText(text)
-    print(QuestionGenerator.generateQuestions(text))    
+    print(QuestionExtractor.extractQuestions(text))    
     # print(RagIntegration.addDocumentWithUrl(text))

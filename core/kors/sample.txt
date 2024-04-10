@@ -81,8 +81,7 @@ solution provided by the company is OpenVPN.
 VI. Endpoint security Software must be installed only from official and trusted vendors. It is prohibited to install cracked or pirated software as it is both illegal and extremely dangerous for the entire infrastructure of the company.
 
 
-Employees shall uninstall old or unnecessary applications. Otherwise these applications
-need to be patched or updated.
+Employees shall uninstall old or unnecessary applications. Otherwise these applications need to be patched or updated.
 
 
 Antivirus shall be enabled and kept updated. The company endorses the default OS
