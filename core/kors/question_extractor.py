@@ -26,7 +26,7 @@ class QuestionExtractor:
         openai_api_key=openApiKey,
     )
     
-    chain = create_extraction_chain(llm, schema,encoder_or_encoder_class="JSON",input_formatter="triple_quotes")
+    chain = create_extraction_chain(llm, schema,encoder_or_encoder_class="JSON",input_formatter=None)
     
     @staticmethod
     def extractQuestions(text: str):
