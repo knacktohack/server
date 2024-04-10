@@ -17,6 +17,8 @@ from core.semantic_router.create_index import createIndex
 from core.semantic_router.utils import insertRoute,deleteAll
 from core.question_generation.question_generator import QuestionGenerator
 from core.integration.process_chunk import processChunk
+from core.chunker import getChunksFromFiles
+from core.kors.question_extractor import QuestionExtractor
 # print(pc.describe_index("test"))
 
 # res = index.upsert(vectors=[
@@ -62,9 +64,16 @@ from core.integration.process_chunk import processChunk
 if __name__ == "__main__":
     # take input considering newlines
     # input = input("Enter the text: ")
+    # print(QuestionExtractor.extractQuestions(input))
     # # #extract questions
     # # output = QuestionGenerator.generateQuestions(input)
     # # print(output)
     # processChunk(input)
-    deleteAll()
+    # deleteAll()
+    questions = QuestionExtractor.extractQuestions(getChunksFromFiles("https://knacktohackstorage.blob.core.windows.net/chunked/sample.pdf")['chunks'][1])
+    
+    for question in questions['question_parser']['question']:
+        generatedQuestions = QuestionGenerator.generateQuestions(question)
+        print(question)
+        print(generatedQuestions)
     # insertRoute("test", ["hello", "world"])

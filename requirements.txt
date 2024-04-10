@@ -44,3 +44,16 @@ yarl==1.9.4
 kor
 openai
 semantic-router[pinecone]==0.0.32
+spacy
+unstructured
+pdf2image
+pdfminer
+pdfminer.six
+pillow_heif
+opencv-python
+pytesseract
+# python-poppler
+unstructured_pytesseract
+unstructured_inference
+pikepdf
+pypdf

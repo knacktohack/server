@@ -3,7 +3,11 @@ from pydantic import BaseModel, Field, validator
 
 schema = Object(
     id="question_parser",
-    description="A list of rules or regulations are provided. Questions are to be generated which would reflect the kinds of questions that would be asked by a malicious user trying to circumvent or go againt these rules. The questions should be generated in a way that they are not directly asking for the answer. NOTE - Consider all aspects in which the rule may be violated",
+    description="""A paragraph of rules or regulations are provided.
+    Find the rules in the paragraph pertaining to employee conduct and security.
+    Questions are to be generated which would reflect the kinds of questions that would be asked by a malicious employee trying to circumvent or go againt any of these rules.
+    The questions should be generated in an indirect way. NOTE - Consider all aspects in which the rule may be violated.
+    Generate a maximum of 5 most relevant questions""",
     attributes=[
         Text(
             id="question",
@@ -37,7 +41,15 @@ schema = Object(
                         "Questions about installing open source software",
                     ],
                 ),
-            ]
+                (
+                    "laptop is banned",
+                    [
+                        "Questions about using a laptop",
+                        "Questions about using a desktop",
+                        "Questions about using a tablet",
+                    ],
+                )
+            ],
         )
     ],
 )
