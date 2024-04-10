@@ -57,3 +57,5 @@ unstructured_pytesseract
 unstructured_inference
 pikepdf
 pypdf
+langchain_openai
+langchain_pinecone

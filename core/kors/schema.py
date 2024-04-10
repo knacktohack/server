@@ -7,7 +7,7 @@ schema = Object(
     Find the rules in the paragraph pertaining to employee conduct and security.
     Questions are to be generated which would reflect the kinds of questions that would be asked by a malicious employee trying to circumvent or go againt any of these rules.
     The questions should be generated in an indirect way. NOTE - Consider all aspects in which the rule may be violated.
-    Generate a maximum of 5 most relevant questions""",
+    Generate a maximum of 3 most relevant questions""",
     attributes=[
         Text(
             id="question",

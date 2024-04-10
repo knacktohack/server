@@ -2,21 +2,21 @@ from .common_imports import *
 def getChunks(text:str) -> list[str]:
   return text.split("\n")
 
-def getChunksFromFiles(filepath: str) :
+def getChunksFromFiles(filepath: str, chunk_size=4000, chunk_overlap=20) :
   # if filepath.split(".")[-1] == "pdf":
   # works for muultiple formats
   
   #for pdf only
-  chunks=get_pdf_chunks_from_url(filepath)
+  chunks=get_pdf_chunks_from_url(filepath, chunk_size, chunk_overlap)
   return chunks
   
 
-def get_pdf_chunks_from_url(path):
+def get_pdf_chunks_from_url(path,chunk_size=4000,chunk_overlap=20):
     loader = OnlinePDFLoader(path)
     data = loader.load()
     #preprocess the data
     cleaned_text=clean_text(data[0].page_content)
-    chunks=chunk_text(cleaned_text)
+    chunks=chunk_text(cleaned_text, chunk_size, chunk_overlap)
     return {
         'page_content':cleaned_text,
         
@@ -31,11 +31,11 @@ def clean_text(doc):
     return cleaned_text
 
 
-def chunk_text(doc):
+def chunk_text(doc,chunk_size=4000,chunk_overlap=20):
     text_splitter = RecursiveCharacterTextSplitter(
     # Set a really small chunk size, just to show.
-    chunk_size=4000,
-    chunk_overlap=20,
+    chunk_size=chunk_size,
+    chunk_overlap=chunk_overlap,
     length_function=len,
     is_separator_regex=False,
 )

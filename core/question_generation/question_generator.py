@@ -4,6 +4,9 @@ from langchain.chains import LLMChain
 # from langchain.llms import OpenAI
 from langchain.chat_models import ChatOpenAI
 from dotenv import load_dotenv
+from ..rag.utils import RagIntegration
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 
 load_dotenv()
 
@@ -24,18 +27,29 @@ class QuestionGenerator:
         Consider ALL ASPECTS of how the user may ask a question.
         Generate a DIFFERENT question each time. Avoid generating REPETITIVE questions.
         The generated questions should appear NATURAL. Output each of the generated questions on a new line. Do not include any additional information.
+        Use the following context
+        
+        Context - {context}
         
         Question - {original_question}
     """,
        input_variables=["original_question"])
     
     
+    retriever = RagIntegration.getRetriever()
+    
+    parser = StrOutputParser()
     
     @staticmethod
     def generateQuestions(original_question: str):
         # filled_template = QuestionGenerator.template.format(original_question=original_question)    
-        chain = LLMChain(llm=QuestionGenerator.llm, prompt=QuestionGenerator.template)
-        output = chain.run(original_question=original_question)
+        chain = (
+            {"context":QuestionGenerator.retriever, "original_question":RunnablePassthrough()}
+            | QuestionGenerator.template
+            | QuestionGenerator.llm
+            | QuestionGenerator.parser
+        )
+        output = chain.invoke(original_question)
         
         #split by newlines
         output = output.split("\n")
