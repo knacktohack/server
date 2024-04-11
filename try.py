@@ -16,7 +16,7 @@
 # from core.semantic_router.create_index import createIndex
 # from core.semantic_router.utils import insertRoute,deleteAll
 # from core.question_generation.question_generator import QuestionGenerator
-# # from core.integration.pinecone_integration import PineConeIntegration
+from core.integration.pinecone_integration import PineConeIntegration
 # # from core.chunker import getChunksFromFiles
 # from core.kors.question_extractor import QuestionExtractor
 # from core.rag.utils import RagIntegration
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     #     print(question)
     #     print(generatedQuestions)
     # insertRoute("test", ["hello", "world"])
-    # text = input("Enter the text: ")
+    text = input("Enter the text: ")
     # # RagIntegration.addText(text)
     # print(QuestionExtractor.extractQuestions(text))    
     # print(RagIntegration.addDocumentWithUrl(text))
@@ -90,3 +90,4 @@ if __name__ == "__main__":
     # loopForChunkingQueue(deleteMessage=False)
     # publishToChunkingQueue({"url":"https://knacktohackstorage.blob.core.windows.net/chunked/sample.pdf"})
     print(getAllFiles())
+    PineConeIntegration.processChunk(text)

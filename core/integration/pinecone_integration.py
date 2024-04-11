@@ -6,7 +6,10 @@ import os
 from semantic_router.encoders import OpenAIEncoder
 from semantic_router.layer import RouteLayer,Route
 from dotenv import load_dotenv
+from ..pinecone.question_utils import PineconeClient
+
 load_dotenv()
+
 
 encoder = OpenAIEncoder(
     openai_api_key=os.getenv("OPENAI_API_KEY")
@@ -14,19 +17,19 @@ encoder = OpenAIEncoder(
 
 class PineConeIntegration:
     index = returnIndex()
-    print(index)
-    routes_dict = {}
-    for route, utterance in index.get_routes():
-        if route not in routes_dict:
-            routes_dict[route] = []
-        routes_dict[route].append(utterance)
+
+    # routes_dict = {}
+    # for route, utterance in index.get_routes():
+    #     if route not in routes_dict:
+    #         routes_dict[route] = []
+    #     routes_dict[route].append(utterance)
     
-    routes = [
-        Route(name=route, utterances=utterances)
-        for route, utterances in routes_dict.items()
-    ]
+    # routes = [
+    #     Route(name=route, utterances=utterances)
+    #     for route, utterances in routes_dict.items()
+    # ]
     
-    routeLayer = RouteLayer(routes=routes,encoder=encoder,index=index)
+    routeLayer = None#RouteLayer(routes=routes,encoder=encoder,index=index)
     
     @staticmethod
     def generateRouteLayer():
@@ -47,9 +50,19 @@ class PineConeIntegration:
     @staticmethod
     def processChunk(chunk: str):
         questions = QuestionExtractor.extractQuestions(chunk)
+        print(questions)
+        
+        dataInsert = []
         for question in questions['question_parser'][0]['listElement']:
-            generatedQuestions = QuestionGenerator.generateQuestions(question['question'])
-            insertRoute(question,generatedQuestions)
+            vector = encoder(question['question'])[0]
+            similarDataScore = PineconeClient.findSimilarVector(vector)
+            
+            if(similarDataScore < 0.85):
+                print(question, similarDataScore)
+                generatedQuestions = QuestionGenerator.generateQuestions(question['question'])
+                insertRoute(question['question'],generatedQuestions)
+                PineconeClient.insertData([{"question": question['question'], "vector": vector}])
+
         return questions
     
     @staticmethod
@@ -59,6 +72,8 @@ class PineConeIntegration:
     
     @staticmethod
     def getRoute(text: str):
+        if PineConeIntegration.routeLayer is None:
+            PineConeIntegration.routeLayer = PineConeIntegration.generateRouteLayer()
         vector = PineConeIntegration.routeLayer._encode(text)
         route,score = PineConeIntegration.routeLayer._retrieve_top_route(vector=vector)
         return route,score
