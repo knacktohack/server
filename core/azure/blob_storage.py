@@ -1,6 +1,7 @@
 from azure.storage.blob import BlobServiceClient
 from azure.core.exceptions import ResourceExistsError
 import os
+import uuid
 from dotenv import load_dotenv
 load_dotenv()
 from .message_queue import publishToChunkingQueue
@@ -14,9 +15,17 @@ def uploadToBlobStorage(data,fileName):
         blobClient = blobServiceClient.get_blob_client(container=containerName, blob=fileName)
             
         uploadUrl = blobClient.url
-        
-        publishToChunkingQueue({"url":uploadUrl,"fileName":fileName})
+    
         blobClient.upload_blob(data)
+        publishToChunkingQueue({"url":uploadUrl,"fileName":fileName})
             
     except ResourceExistsError as e:
-        print(f"ResourceExistsError: {e}")
+        #generate random filename
+        fileName = str(uuid.uuid4()) + fileName
+        
+        uploadToBlobStorage(data,fileName)
+        
+    except Exception as e:
+        print(e)
+        raise e
+        
