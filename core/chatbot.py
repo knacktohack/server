@@ -1,4 +1,5 @@
 from .common_imports import *
+from flask import Flask, request, jsonify
 dotenv.load_dotenv()
 import requests
 chat = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0)

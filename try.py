@@ -87,5 +87,5 @@ if __name__ == "__main__":
     # print(QuestionExtractor.extractQuestions(text))    
     # print(RagIntegration.addDocumentWithUrl(text))
     # uploadToBlobStorage("/Users/adityaganguly/college/MG/sample1.pdf","sample1.pdf")
-    loopForChunkingQueue()
+    loopForChunkingQueue(deleteMessage=False)
     # publishToChunkingQueue({"url":"https://knacktohackstorage.blob.core.windows.net/chunked/sample.pdf"})
