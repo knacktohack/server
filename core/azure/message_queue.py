@@ -1,4 +1,5 @@
 from azure.eventhub import EventHubProducerClient, EventData, EventHubConsumerClient, PartitionContext,EventHubSharedKeyCredential
+from azure.servicebus import ServiceBusClient, ServiceBusMessage
 import os
 from dotenv import load_dotenv
 import time
@@ -13,7 +14,7 @@ azureValue = os.getenv("AZURE_KEY_VALUE")
 
 
 def publishToServiceBusQueue(
-    connectionString: str, queueName: str, message: str
+    connectionString: str, queueName: str, message: str | dict
 ) -> None:
     """
     Publish a message to an Azure Service Bus Queue.
@@ -26,7 +27,10 @@ def publishToServiceBusQueue(
     producer = EventHubProducerClient.from_connection_string(
         conn_str=connectionString, eventhub_name=queueName
     )
-    print(producer)
+    
+    if(isinstance(message,dict)):
+        message = json.dumps(message)
+        
     eventDataBatch = producer.create_batch()
     eventDataBatch.add(EventData(message))
     producer.send_batch(eventDataBatch)
@@ -43,71 +47,42 @@ def publishToChunkingQueue(message: str) -> None:
     publishToServiceBusQueue(queueConnectionString, chunkingQueueName, message)
 
 
-def pollForMessages(
-    queueName: str,
-    consumerGroup: str = "$default",
-    maxMessages: int = 1,
-    callback=print,
-    delete: bool = True,
-) -> None:
-    """
-    Polls for messages from an Azure Service Bus Queue (Event Hub).
+def pollQueue(queueName, maxMessages: int = 10, deleteMessage: bool = False) -> list:
+    serviceBusClient = ServiceBusClient.from_connection_string(conn_str=queueConnectionString)
+    receiver = serviceBusClient.get_queue_receiver(queue_name=queueName, max_wait_time=5)
 
-    Args:
-        queueName (str): The name of the queue (Event Hub) to listen to.
-        consumerGroup (str, optional): The consumer group to use. Defaults to "$default".
-        maxMessages (int, optional): The maximum number of messages to receive per poll. Defaults to 1.
-        callback (callable, optional): The function to call with processed messages. Defaults to print.
-        delete (bool, optional): Whether to acknowledge received messages (similar to SQS deletion). Defaults to True.
-    """
+    messagesArray = []
 
-    if not queueConnectionString:
-        raise ValueError("Missing environment variable: SERVICE_BUS_CONNECTION_STRING")
+    with serviceBusClient:
+        with receiver:
+            messages = receiver.receive_messages(max_message_count=maxMessages)
+            for message in messages:
+                body=""
+                for b in message.body:
+                    body+=b.decode("utf-8")
+                messageBody = body
+                
+                try:
+                    jsonBody = json.loads(messageBody)
+                except:
+                    jsonBody = messageBody
+                messagesArray.append(jsonBody)
+                
+                
+                if deleteMessage:
+                    receiver.complete_message(message)
+    return messagesArray
+
+
+def loop(queueName, callback=print,timeInMinutes: int = 0.1,maxMessages=10,deleteMessage=False) -> None:
+    while True:
+        messages = pollQueue(queueName,maxMessages=maxMessages,deleteMessage=deleteMessage)
+        callback(messages)
+        time.sleep(timeInMinutes * 60)
     
 
-    credential = EventHubSharedKeyCredential(azureKey, azureValue)
-    client = EventHubConsumerClient(
-        eventhub_name=queueName,
-        consumer_group=consumerGroup,
-        fully_qualified_namespace=fullyQualifiedNamespace,
-        credential=credential,
-        max_batch_size=maxMessages
-    )
 
-    def onEventReceived(partitionContext: PartitionContext,eventData: EventData) -> None:
-        processedMessages = []
-        for message in json.loads(eventData.body.decode("utf-8")):
-            processedMessages.append(message)
-        callback(processedMessages)
-
-        # Acknowledge the received message (similar to SQS deletion)
-        if delete:
-            partitionContext.update_checkpoint(eventData)
-
-    try:
-        with client:
-            client.receive(
-                on_event=onEventReceived
-            )
-    except KeyboardInterrupt:
-        print("Stopped polling due to keyboard interrupt.")
-
-
-def loopForMessages(queueName: str, timeInMinutes: int = 0.1, **kwargs) -> None:
-    """
-    Continuously polls an Azure Service Bus Queue (Event Hub) at a specified interval.
-
-    Args:
-        queueName (str): The name of the queue (Event Hub) to listen to.
-        timeInMinutes (int, optional): The interval between polls in minutes. Defaults to 10.
-        **kwargs: Additional arguments passed to pollForMessages function.
-    """
-    while True:
-        pollForMessages(queueName, **kwargs)
-        time.sleep(timeInMinutes * 60)
-
-
-def loopForChunkingQueue(timeInMinutes: int = 0.1, **kwargs) -> None:
+def loopForChunkingQueue(timeInMinutes: int = 0.1,deleteMessage=False) -> None:
     """
     Continuously polls the Azure Chunking Queue at a specified interval.
 
@@ -115,4 +90,4 @@ def loopForChunkingQueue(timeInMinutes: int = 0.1, **kwargs) -> None:
         timeInMinutes (int, optional): The interval between polls in minutes. Defaults to 10.
         **kwargs: Additional arguments passed to pollForMessages function.
     """
-    loopForMessages(chunkingQueueName, timeInMinutes, **kwargs)
+    loop(queueName=chunkingQueueName, timeInMinutes=timeInMinutes, deleteMessage=deleteMessage)
