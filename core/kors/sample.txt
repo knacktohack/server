@@ -48,8 +48,7 @@ unauthorized people do not have access to their devices. Physical access dismant
 digital controls & restrictions, therefore a device is much more exposed to attacks where
 physical access is unrestricted to unauthorized people.
 
- V. Remote access and authentication It is prohibited to use any public networks for work. In case of necessity, access to company's resources and system in public areas must be done on mobile private networks
-(hotspot) and only while using the company approved VPN.
+ V. Remote access and authentication It is prohibited to use any public networks for work. In case of necessity, access to company's resources and system in public areas must be done on mobile private networks (hotspot) and only while using the company approved VPN.
 
 
 Employees must have two factor authentication enabled on every application & service
@@ -81,12 +80,10 @@ solution provided by the company is OpenVPN.
 VI. Endpoint security Software must be installed only from official and trusted vendors. It is prohibited to install cracked or pirated software as it is both illegal and extremely dangerous for the entire infrastructure of the company.
 
 
-Employees shall uninstall old or unnecessary applications. Otherwise these applications
-need to be patched or updated.
+Employees shall uninstall old or unnecessary applications. Otherwise these applications need to be patched or updated.
 
 
-Antivirus shall be enabled and kept updated. The company endorses the default OS
-provided anti-virus (windows defender). Linux users will use ClamAV.
+Antivirus shall be enabled and kept updated. The company endorses the default OS provided anti-virus (windows defender). Linux users will use ClamAV.
 VII. Data protection and confidentiality Employees shall use means of encryption & cryptographic solutions while transferring
 data, connecting to the network, etc. Employees shall use only company approved channels of communication - Gmail, Google Chat, Microsoft Teams, Zoom, Zoho. Company files & documents shall be sent only through approved channels of communication - Gmail, Google Chat.
 

@@ -47,8 +47,8 @@ class PineConeIntegration:
     @staticmethod
     def processChunk(chunk: str):
         questions = QuestionExtractor.extractQuestions(chunk)
-        for question in questions['question_parser']['question']:
-            generatedQuestions = QuestionGenerator.generateQuestions(question)
+        for question in questions['question_parser'][0]['listElement']:
+            generatedQuestions = QuestionGenerator.generateQuestions(question['question'])
             insertRoute(question,generatedQuestions)
         return questions
     
