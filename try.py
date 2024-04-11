@@ -15,11 +15,13 @@
 
 # from core.semantic_router.create_index import createIndex
 # from core.semantic_router.utils import insertRoute,deleteAll
-from core.question_generation.question_generator import QuestionGenerator
-# from core.integration.pinecone_integration import PineConeIntegration
-# from core.chunker import getChunksFromFiles
-from core.kors.question_extractor import QuestionExtractor
-from core.rag.utils import RagIntegration
+# from core.question_generation.question_generator import QuestionGenerator
+# # from core.integration.pinecone_integration import PineConeIntegration
+# # from core.chunker import getChunksFromFiles
+# from core.kors.question_extractor import QuestionExtractor
+# from core.rag.utils import RagIntegration
+from core.azure.blob_storage import uploadToBlobStorage
+from core.azure.message_queue import publishToChunkingQueue,loopForChunkingQueue
 
 # print(pc.describe_index("test"))
 
@@ -80,7 +82,9 @@ if __name__ == "__main__":
     #     print(question)
     #     print(generatedQuestions)
     # insertRoute("test", ["hello", "world"])
-    text = input("Enter the text: ")
-    # RagIntegration.addText(text)
-    print(QuestionExtractor.extractQuestions(text))    
+    # text = input("Enter the text: ")
+    # # RagIntegration.addText(text)
+    # print(QuestionExtractor.extractQuestions(text))    
     # print(RagIntegration.addDocumentWithUrl(text))
+    # uploadToBlobStorage("/Users/adityaganguly/college/MG/sample1.pdf","sample1.pdf")
+    loopForChunkingQueue()

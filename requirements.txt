@@ -59,3 +59,9 @@ pikepdf
 pypdf
 langchain_openai
 langchain_pinecone
+flask
+azure-storage-blob
+azure-eventhub
+azure-identity
+azure-servicebus
+aiohttp

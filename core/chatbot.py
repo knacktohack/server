@@ -1,6 +1,6 @@
 from .common_imports import *
 dotenv.load_dotenv()
-
+import requests
 chat = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0)
 app = Flask(__name__)
 class InMemoryHistory(BaseChatMessageHistory, BaseModel):
@@ -86,10 +86,10 @@ with_message_history = RunnableWithMessageHistory(
     ],
 )
 
-resp=with_message_history.invoke(
-    { "question": "What does cosine mean?"},
-    config={"configurable": {"user_id": "123", "conversation_id": "1"}}
-)
+# resp=with_message_history.invoke(
+#     { "question": "What does cosine mean?"},
+#     config={"configurable": {"user_id": "123", "conversation_id": "1"}}
+# )
 
 
 
