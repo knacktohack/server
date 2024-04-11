@@ -20,7 +20,7 @@
 # # from core.chunker import getChunksFromFiles
 # from core.kors.question_extractor import QuestionExtractor
 # from core.rag.utils import RagIntegration
-from core.azure.blob_storage import uploadToBlobStorage
+from core.azure.blob_storage import uploadToBlobStorage,getAllFiles
 from core.azure.message_queue import publishToChunkingQueue,loopForChunkingQueue
 
 # print(pc.describe_index("test"))
@@ -87,5 +87,6 @@ if __name__ == "__main__":
     # print(QuestionExtractor.extractQuestions(text))    
     # print(RagIntegration.addDocumentWithUrl(text))
     # uploadToBlobStorage("/Users/adityaganguly/college/MG/sample1.pdf","sample1.pdf")
-    loopForChunkingQueue(deleteMessage=False)
+    # loopForChunkingQueue(deleteMessage=False)
     # publishToChunkingQueue({"url":"https://knacktohackstorage.blob.core.windows.net/chunked/sample.pdf"})
+    print(getAllFiles())

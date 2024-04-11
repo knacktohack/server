@@ -11,6 +11,9 @@ containerName = os.getenv("AZURE_STORAGE_CONTAINER_NAME")
 
 def uploadToBlobStorage(data,fileName):
     try:
+        #append date as string to filename
+        
+        
         blobServiceClient = BlobServiceClient.from_connection_string(connectionString)
         blobClient = blobServiceClient.get_blob_client(container=containerName, blob=fileName)
             
@@ -21,10 +24,22 @@ def uploadToBlobStorage(data,fileName):
             
     except ResourceExistsError as e:
         #generate random filename
-        fileName = str(uuid.uuid4()) + fileName
+        # fileName = str(uuid.uuid4()) + fileName
         
-        uploadToBlobStorage(data,fileName)
+        # uploadToBlobStorage(data,fileName)
+        pass
         
+    except Exception as e:
+        print(e)
+        raise e
+    
+    
+def getAllFiles():
+    try:
+        blobServiceClient = BlobServiceClient.from_connection_string(connectionString)
+        containerClient = blobServiceClient.get_container_client(containerName)
+        blobs = containerClient.list_blobs()
+        return [blob.name for blob in blobs]
     except Exception as e:
         print(e)
         raise e
