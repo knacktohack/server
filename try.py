@@ -22,7 +22,8 @@
 # # from core.rag.utils import RagIntegration
 # from core.azure.blob_storage import uploadToBlobStorage,getAllFiles
 # from core.azure.message_queue import publishToChunkingQueue,loopForChunkingQueue
-
+from core.mongo.utils import MongoUtils
+from pymongo import MongoClient
 # # print(pc.describe_index("test"))
 
 # # res = index.upsert(vectors=[
@@ -65,7 +66,7 @@
 # # print(res)
 # # print([v["metadata"]["text"] for v in res["matches"]])
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 #     # take input considering newlines
 #     # input = input("Enter the text: ")
 #     # print(QuestionExtractor.extractQuestions(input))
@@ -91,12 +92,14 @@
 #     # publishToChunkingQueue({"url":"https://knacktohackstorage.blob.core.windows.net/chunked/sample.pdf"})
 #     print(getAllFiles())
 #     PineConeIntegration.processChunk(text)
+    #MongoUtils.insertQuestion({"question": "What is the capital of India?", "organization_id": "1", "priority": 5})
+    # MongoUtils.deleteAll("questions")
+    # print(MongoUtils.queryByPriorityGreaterThan(8))
+    print("Hello")
 
 
-from pymongo import MongoClient
-
-client = MongoClient("mongodb+srv://amartya:6411@cluster0.kvdsk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-db = client.knacktohack
+# client = MongoClient("mongodb+srv://amartya:6411@cluster0.kvdsk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+# db = client.knacktohack
 
 # try:
 #     client.admin.command('ping')
@@ -111,25 +114,25 @@ db = client.knacktohack
 # except Exception as e:
 #     print(e)
 
-questions = db.questions
+# questions = db.questions
 
-try:
-    question = {
-        "question": "some random question",
-        "organization_id": "1",
-        "priority": 5
-    } 
-    res = questions.insert_one(question)
-    print("added", res.inserted_id)
-except Exception as e:
-    print(e)
+# try:
+#     question = {
+#         "question": "some random question",
+#         "organization_id": "1",
+#         "priority": 5
+#     } 
+#     res = questions.insert_one(question)
+#     print("added", res.inserted_id)
+# except Exception as e:
+#     print(e)
 
-updated_question = "new random"
-try:
-    res = questions.find_one_and_update({"question": "some random question", "organization_id": "1"}, {"$set": {"priority": 8, "question": updated_question}})
+# updated_question = "new random"
+# try:
+#     res = questions.find_one_and_update({"question": "some random question", "organization_id": "1"}, {"$set": {"priority": 8, "question": updated_question}})
     
-    print("updated", res)
-except Exception as e:
-    print(e)
+#     print("updated", res)
+# except Exception as e:
+#     print(e)
 
 
