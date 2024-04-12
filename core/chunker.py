@@ -1,22 +1,3 @@
-<<<<<<< HEAD
-from PyPDF2 import PdfReader
-
-def getChunks(text:str) -> list[str]:
-  return text.split("\n")
-
-def getChunksFromFiles(filepath: str) -> str:
-  # if filepath.split(".")[-1] == "pdf":
-  # works for muultiple formats
-  reader = PdfReader(filepath)
-  text = ""
-  for page in reader.pages:
-    text += page.extract_text() + "\n"
-  
-  return getChunks(text)
-  
-
-
-=======
 from .common_imports import *
 def getChunks(text:str) -> list[str]:
   return text.split("\n")
@@ -66,4 +47,3 @@ def chunk_text(doc,chunk_size=4000,chunk_overlap=20):
 # print(cs[0])
 # print(type(cs))
 # print(type(cs[0]))
->>>>>>> 2ef5c7383d7273a09ef04130d40222a8c476a8ae
