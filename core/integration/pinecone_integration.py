@@ -39,6 +39,7 @@ class PineConeIntegration:
                 routes_dict[route] = []
             routes_dict[route].append(utterance)
 
+        print(routes_dict)
         routes = [
             Route(name=route, utterances=utterances)
             for route, utterances in routes_dict.items()

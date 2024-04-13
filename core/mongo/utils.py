@@ -126,6 +126,14 @@ class MongoUtils:
         return collection.find_one({"_id": id})
     
     @staticmethod
+    def queryQuestionsByOrganizationId(organizationId):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[questionCollection]
+        documents = collection.find({"organization_id": organizationId})
+        return list(documents)
+    
+    @staticmethod
     def deleteQuestion(id):
         client = MongoUtils.client
         db = client[dbName]
@@ -141,6 +149,14 @@ class MongoUtils:
         collection = db[questionCollection]
         result = collection.update_one({"_id": id}, {"$set": question})
         return result.modified_count
+    
+    @staticmethod
+    def queryAllQuestions():
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[questionCollection]
+        documents = collection.find()
+        return list(documents)
 
     @staticmethod
     def queryByQuestion(question):

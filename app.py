@@ -165,17 +165,28 @@ def get_text(user_id,conversation_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/questions", methods=["GET"])
-def get_question(question, organizationName):
+@app.route("/questions", methods=["POST"])
+def get_question():
     try: 
-        organizationId = MongoUtils.queryOrganizationIdByName(organizationName)
-        res = MongoUtils.queryByQuestionAndOrganizationId(question, organizationId)
-        return jsonify(res)
-        # if organization_id:
-        #     res = questions.find({"organization_id"})
+        body  = request.get_json()
+        
+        questions = []
+        
+        if "organization" in body:
+            organizationName = body["organization"]
+            organizationId = MongoUtils.queryOrganizationIdByName(organizationName)
+            questions = MongoUtils.queryQuestionsByOrganizationId(organizationId)
+            
+        else:
+            questions = MongoUtils.queryAllQuestions()
+            
+        return jsonify(questions)
      
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+    
+    
     
 @app.route("/questions/new", methods=["POST"])
 def insert_question():
