@@ -11,6 +11,7 @@ dbName = os.getenv("MONGO_DB")
 questionCollection = os.getenv("QUESTION_COLLECTION")
 chatCollection = os.getenv("CHAT_COLLECTION")
 violationCollection = os.getenv("VIOLATION_COLLECTION")
+organizationCollection = os.getenv("ORGANIZATION_COLLECTION")
 
 """
 question is a dictionary with the following keys
@@ -47,6 +48,12 @@ violation is a dictionary with the following keys
     "violation_question": "What is the capital of Nigeria?",
     "violation_priority": 5,
     "date": "2021-09-01"
+}
+
+organization is of the type
+
+{
+    "organization_name": "KnackToHack"
 }
 
 """
@@ -110,6 +117,30 @@ class MongoUtils:
         collection = db[questionCollection]
         result = collection.insert_one(question)
         return result.inserted_id
+    
+    @staticmethod
+    def queryQuestionById(id):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[questionCollection]
+        return collection.find_one({"_id": id})
+    
+    @staticmethod
+    def deleteQuestion(id):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[questionCollection]
+        result = collection.delete_one({"_id": id})
+        return result.deleted_count
+    
+    
+    @staticmethod
+    def updateQuestion(id, question):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[questionCollection]
+        result = collection.update_one({"_id": id}, {"$set": question})
+        return result.modified_count
 
     @staticmethod
     def queryByQuestion(question):
@@ -143,6 +174,17 @@ class MongoUtils:
         db = client[dbName]
         collection = db[questionCollection]
         documents = collection.find({"priority": {"$lt": priority}})
+        return list(documents)
+    
+    
+    @staticmethod
+    def queryByQuestionAndOrganizationId(question, organizationId):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[questionCollection]
+        documents = collection.find(
+            {"question": {"$regex": question, "$options": "i"}, "organization_id": organizationId}
+        )
         return list(documents)
 
     @staticmethod
@@ -262,3 +304,29 @@ class MongoUtils:
             }
         )
         return list(documents)
+    
+    @staticmethod
+    def insertOrganization(organization):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[organizationCollection]
+        result = collection.insert_one(organization)
+        return result.inserted_id
+    
+    @staticmethod
+    def queryOrganizationIdByName(organizationName):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[organizationCollection]
+        document  = collection.find_one({"organization_name": organizationName})
+        
+        if document:
+            return document["_id"].__str__()
+        
+        else:
+            #create new organization
+            organization = {
+                "organization_name": organizationName
+            }
+            result = collection.insert_one(organization)
+            return result.inserted_id.__str__()

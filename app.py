@@ -12,14 +12,13 @@ from core.chatbot import get_session_history, format_session_messages,with_messa
 import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from core.azure.blob_storage import uploadToBlobStorage
+from core.azure.blob_storage import uploadToBlobStorage,getAllFilesByOrganizationId
 from pymongo import MongoClient
+from core.mongo.utils import MongoUtils
 load_dotenv()
 app = Flask(__name__)
 # app.config["MONGO_CLIENT"] = MongoClient(os.getenv("MONGO_URL"))
-mongo_client = MongoClient(os.getenv("MONGO_URL"))
 # app.config["MONGO_DB"] = app.config["MONGO_CLIENT"].knacktohack
-mongo_db = mongo_client.knacktohack
 
 # origins = [
 #     "http://localhost",
@@ -49,6 +48,13 @@ def uploadFileToBlobStorage():
     try:
         # Get uploaded file from form data
         uploadedFile = request.files.get("file")
+        organization = "knacktohack"
+        if "organization" in request.form:
+            organization = request.form.get("organization")
+            print(organization)
+            
+        organizationId = MongoUtils.queryOrganizationIdByName(organization)
+        print(organizationId)
         if not uploadedFile:
             return jsonify({"message": "No file uploaded"}), 400
 
@@ -57,12 +63,36 @@ def uploadFileToBlobStorage():
         fileData = uploadedFile.read()
 
         # Call the upload function
-        uploadToBlobStorage(fileData, fileName)
+        uploadToBlobStorage(fileData, fileName,organizationId)
 
         return jsonify({"message": f"Successfully uploaded {fileName} to Azure Blob Storage"})
     except Exception as e:
         print(e)
         return jsonify({"message": "There was an error uploading the file"}), 500
+    
+    
+@app.route("/files", methods=["POST"])
+def getFiles():
+    try:
+        organization = "knacktohack"
+        #check request.body as json for organization
+        body = request.get_json()
+        print(body)
+        if "organization" in body:
+            organization = body["organization"]
+            
+        organizationId = MongoUtils.queryOrganizationIdByName(organization)
+        print(organizationId)
+        files = getAllFilesByOrganizationId(organizationId)
+        
+        return jsonify(files)
+    
+
+    except Exception as e:
+        print(e)
+        return jsonify({"message": "There was an error getting the files"}), 500
+        
+        
 
 
 @app.get("/query")
@@ -107,14 +137,11 @@ def get_text(user_id,conversation_id):
         return jsonify({"error": str(e)}), 500
 
 @app.route("/questions", methods=["GET"])
-def get_question(question_id, organization_id):
+def get_question(question, organizationName):
     try: 
-        questions = mongo_db.questions
-        if question_id:
-            res = questions.find_one({"_id":question_id})
-            return jsonify({"data": res})
-        res = questions.find({})
-        return jsonify({"data": res})
+        organizationId = MongoUtils.queryOrganizationIdByName(organizationName)
+        res = MongoUtils.queryByQuestionAndOrganizationId(question, organizationId)
+        return jsonify(res)
         # if organization_id:
         #     res = questions.find({"organization_id"})
      
@@ -122,38 +149,51 @@ def get_question(question_id, organization_id):
         return jsonify({"error": str(e)}), 500
     
 @app.route("/questions/new", methods=["POST"])
-def get_question():
+def insert_question():
     try: 
-        questions = mongo_db.questions
+        body = request.get_json()
+        organizationName = body["organization"]
+        organizationId = MongoUtils.queryOrganizationIdByName(organizationName)
+        
         question = {
-            "question": request.get_json()["question"],
-            "organization": request.get_json()["organization"],
-            "priority": request.get_json()["priority"] if request.get_json()["priority"] else 0
+            "question": body["question"],
+            "organization_id": organizationId,
+            "priority": body["priority"] if body["priority"] else 0
         }
-        questions.insert_one(question)
+        
+        MongoUtils.insertQuestion(question)
      
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
 @app.route("/questions/<id>", methods=["POST", "PUT", "PATCH"])
-def update_question(id):
-    try: 
-        questions = mongo_db.questions
-        new_question = {
-            "question": request.get_json()["question"],
-            "organization": request.get_json()["organization"],
-            "priority": request.get_json()["priority"] if request.get_json()["priority"] else 0
+def update_question():
+    try:
+        body = request.get_json()
+        id  = body["id"]
+        
+        oldQuestion = MongoUtils.queryQuestionById(id)
+        
+        question = {
+            "question": body["question"] if body["question"] else oldQuestion["question"],
+            "organization_id": body["organization_id"] if body["organization_id"] else oldQuestion["organization_id"],
+            "priority": body["priority"] if body["priority"] else oldQuestion["priority"]
         }
-        questions.find_one_and_update({"_id":id}, {"$set": new_question})
+        
+        cnt = MongoUtils.updateQuestion(id, question)
+        
+        return jsonify({"message": f"Updated {cnt} record"})
      
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @app.route("/questions/<id>", methods=["DELETE"])
-def delete_question(id):
+def delete_question():
     try: 
-        questions = mongo_db.questions
-        questions.find_one_and_delete({"_id":id})
+        id = request.get_json()["id"]
+        cnt = MongoUtils.deleteQuestion(id)
+        
+        return jsonify({"message": f"Deleted {cnt} record"})
      
     except Exception as e:
         return jsonify({"error": str(e)}), 500

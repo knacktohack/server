@@ -21,7 +21,7 @@
 # # from core.kors.question_extractor import QuestionExtractor
 # # from core.rag.utils import RagIntegration
 # from core.azure.blob_storage import uploadToBlobStorage,getAllFiles
-# from core.azure.message_queue import publishToChunkingQueue,loopForChunkingQueue
+from core.azure.message_queue import publishToChunkingQueue,loopForChunkingQueue
 from core.mongo.utils import MongoUtils
 from pymongo import MongoClient
 # # print(pc.describe_index("test"))
@@ -96,6 +96,7 @@ if __name__ == "__main__":
     # MongoUtils.deleteAll("questions")
     # print(MongoUtils.queryByPriorityGreaterThan(8))
     print("Hello")
+    loopForChunkingQueue(deleteMessage=True)
 
 
 # client = MongoClient("mongodb+srv://amartya:6411@cluster0.kvdsk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
