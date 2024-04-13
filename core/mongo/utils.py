@@ -57,7 +57,12 @@ organization is of the type
 }
 
 """
-
+def removeAndInsertId(documents):
+    for document in documents:
+        if "_id" in document:
+            document["id"] = document["_id"].__str__()
+            del document["_id"]
+    return documents
 
 class MongoUtils:
     client = MongoClient(mongoUrl)
@@ -76,6 +81,7 @@ class MongoUtils:
         db = client[dbName]
         collection = db[collectionName]
         documents = collection.find(query)
+        documents = removeAndInsertId(documents)
         return list(documents)
 
     @staticmethod
@@ -92,6 +98,7 @@ class MongoUtils:
         db = client[dbName]
         collection = db[collectionName]
         documents = collection.find()
+        documents = removeAndInsertId(documents)
         return list(documents)
 
     @staticmethod
@@ -100,6 +107,7 @@ class MongoUtils:
         db = client[dbName]
         collection = db[collectionName]
         document = collection.find_one(query)
+        document = removeAndInsertId([document])
         return document
 
     @staticmethod
@@ -131,6 +139,9 @@ class MongoUtils:
         db = client[dbName]
         collection = db[questionCollection]
         documents = collection.find({"organization_id": organizationId})
+        
+        #remove object id and put id as a json key
+        documents = removeAndInsertId(documents)
         return list(documents)
     
     @staticmethod
@@ -155,7 +166,10 @@ class MongoUtils:
         client = MongoUtils.client
         db = client[dbName]
         collection = db[questionCollection]
-        documents = collection.find()
+        documents = collection.find({})
+        print(documents)
+        documents = [document for document in documents]
+        documents = removeAndInsertId(documents)
         return list(documents)
 
     @staticmethod
@@ -201,6 +215,10 @@ class MongoUtils:
         documents = collection.find(
             {"question": {"$regex": question, "$options": "i"}, "organization_id": organizationId}
         )
+        
+        for document in documents:
+            document["id"] = document["_id"]
+            del document["_id"]
         return list(documents)
 
     @staticmethod
