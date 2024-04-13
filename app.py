@@ -44,7 +44,7 @@ async def ping():
     return {"message": "Server is Live"}
 
 @app.route("/upload_rules", methods=["POST"])
-def uploadFileToBlobStorage():
+def uploadRulesToBlobStorage():
     try:
         # Get uploaded file from form data
         uploadedFile = request.files.get("file")
@@ -72,7 +72,7 @@ def uploadFileToBlobStorage():
     
     
 @app.route("/upload_company_documents", methods=["POST"])
-def uploadFileToBlobStorage():
+def uploadCompanyDataToBlobStorage():
     try:
         # Get uploaded file from form data
         uploadedFile = request.files.get("file")
