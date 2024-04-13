@@ -95,7 +95,7 @@ if __name__ == "__main__":
     #MongoUtils.insertQuestion({"question": "What is the capital of India?", "organization_id": "1", "priority": 5})
     # MongoUtils.deleteAll("questions")
     # print(MongoUtils.queryByPriorityGreaterThan(8))
-    print("Hello")
+    # print("Hello")
     loopForChunkingQueue(deleteMessage=True)
 
 
