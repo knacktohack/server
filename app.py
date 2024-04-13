@@ -43,7 +43,7 @@ user_id = "12345"
 async def ping():
     return {"message": "Server is Live"}
 
-@app.route("/upload", methods=["POST"])
+@app.route("/upload_rules", methods=["POST"])
 def uploadFileToBlobStorage():
     try:
         # Get uploaded file from form data
@@ -63,12 +63,41 @@ def uploadFileToBlobStorage():
         fileData = uploadedFile.read()
 
         # Call the upload function
-        uploadToBlobStorage(fileData, fileName,organizationId)
+        uploadToBlobStorage(fileData, fileName,organizationId,type="rules_upload")
 
         return jsonify({"message": f"Successfully uploaded {fileName} to Azure Blob Storage"})
     except Exception as e:
         print(e)
         return jsonify({"message": "There was an error uploading the file"}), 500
+    
+    
+@app.route("/upload_company_documents", methods=["POST"])
+def uploadFileToBlobStorage():
+    try:
+        # Get uploaded file from form data
+        uploadedFile = request.files.get("file")
+        organization = "knacktohack"
+        if "organization" in request.form:
+            organization = request.form.get("organization")
+            print(organization)
+            
+        organizationId = MongoUtils.queryOrganizationIdByName(organization)
+        print(organizationId)
+        if not uploadedFile:
+            return jsonify({"message": "No file uploaded"}), 400
+
+        # Get filename and data
+        fileName = uploadedFile.filename
+        fileData = uploadedFile.read()
+
+        # Call the upload function
+        uploadToBlobStorage(fileData, fileName,organizationId,type="company_documents_upload")
+
+        return jsonify({"message": f"Successfully uploaded {fileName} to Azure Blob Storage"})
+    except Exception as e:
+        print(e)
+        return jsonify({"message": "There was an error uploading the file"}), 500
+    
     
     
 @app.route("/files", methods=["POST"])

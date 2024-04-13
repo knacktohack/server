@@ -9,7 +9,7 @@ from .message_queue import publishToChunkingQueue
 connectionString = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 containerName = os.getenv("AZURE_STORAGE_CONTAINER_NAME")
 
-def uploadToBlobStorage(data,fileName,organizationId="knacktohack"):
+def uploadToBlobStorage(data,fileName,organizationId="knacktohack",type="rules_upload"):
     try:
         blobServiceClient = BlobServiceClient.from_connection_string(connectionString)
         containerClient = blobServiceClient.get_container_client(container=containerName)
@@ -29,7 +29,7 @@ def uploadToBlobStorage(data,fileName,organizationId="knacktohack"):
         uploadUrl = blobClient.url
     
         blobClient.upload_blob(data)
-        publishToChunkingQueue({"url":uploadUrl,"file_name":fileName,"organization_id":organizationId})
+        publishToChunkingQueue({"url":uploadUrl,"file_name":fileName,"organization_id":organizationId,"type":type})
             
     except ResourceExistsError as e:
         print(f"Blob {fileName} already exists")
