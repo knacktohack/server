@@ -24,6 +24,7 @@ from core.integration.pinecone_integration import PineConeIntegration
 from core.azure.message_queue import publishToChunkingQueue,loopForChunkingQueue
 from core.mongo.utils import MongoUtils
 from pymongo import MongoClient
+from core.pinecone.question_utils import PineconeClient
 # # print(pc.describe_index("test"))
 
 # # res = index.upsert(vectors=[
@@ -97,9 +98,14 @@ if __name__ == "__main__":
     # print(MongoUtils.queryByPriorityGreaterThan(8))
     # print("Hello")
     # loopForChunkingQueue(deleteMessage=True)
-    while True:
-        inp = input("Enter the text: ")
-        print(PineConeIntegration.getRoute(inp))
+    # while True:
+    #     inp = input("Enter the text: ")
+    #     print(PineConeIntegration.getRoute(inp))
+    
+    # text = input("Enter the text: ")
+    # PineConeIntegration.processChunk(text)
+    print(MongoUtils.queryAllQuestions())
+    # PineconeClient.createIndex()
 
 
 # client = MongoClient("mongodb+srv://amartya:6411@cluster0.kvdsk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
