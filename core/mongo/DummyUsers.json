@@ -1,0 +1,33 @@
+[
+    {
+        "user_id": "1",
+        "name": "John Doe",
+        "user_email": "hikeradi@gmail.com",
+        "organization_name": "Org A"
+    },
+    {
+        "user_id": "2",
+        "name": "Jane Doe",
+        "user_email": "abc@gmail.com",
+        "organization_name": "Org B"
+    },
+    {
+        "user_id": "3",
+        "name": "John Smith",
+        "user_email": "Adnan Khurshid",
+        "organization_name": "Org C"
+    },
+    {
+        "user_id": "4",
+        "name": "Kabir Singh",
+        "user_email": "kabir@gmail.com",
+        "organization_name": "Org D"
+    },
+
+    {
+        "user_id": "5",
+        "name": "Amorto Chakroborty",
+        "user_email": "amari@gmail.com",
+        "organization_name": "Org E"
+    }
+]

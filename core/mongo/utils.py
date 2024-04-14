@@ -32,7 +32,8 @@ users
 {
     user_name: "Aditya",
     user_id: "12345",
-    organization_name: "12345"
+    organization_name: "12345",
+    "user_email": "abc"
 }
 
 chats is a dictionary with the following keys
@@ -93,56 +94,6 @@ def removeAndInsertId(documents):
 class MongoUtils:
     client = MongoClient(mongoUrl)
 
-    @staticmethod
-    def insertDocument(collectionName, document):
-        client = MongoUtils.client
-        db = client[dbName]
-        collection = db[collectionName]
-        result = collection.insert_one(document)
-        return result.inserted_id
-
-    @staticmethod
-    def queryDocuments(collectionName, query={}):
-        client = MongoUtils.client
-        db = client[dbName]
-        collection = db[collectionName]
-        documents = collection.find(query)
-        documents = removeAndInsertId(documents)
-        return list(documents)
-
-    @staticmethod
-    def deleteDocuments(collectionName, query={}):
-        client = MongoUtils.client
-        db = client[dbName]
-        collection = db[collectionName]
-        result = collection.delete_many(query)
-        return result.deleted_count
-
-    @staticmethod
-    def queryAll(collectionName):
-        client = MongoUtils.client
-        db = client[dbName]
-        collection = db[collectionName]
-        documents = collection.find()
-        documents = removeAndInsertId(documents)
-        return list(documents)
-
-    @staticmethod
-    def queryOne(collectionName, query={}):
-        client = MongoUtils.client
-        db = client[dbName]
-        collection = db[collectionName]
-        document = collection.find_one(query)
-        document = removeAndInsertId([document])
-        return document
-
-    @staticmethod
-    def updateDocument(collectionName, query, update):
-        client = MongoUtils.client
-        db = client[dbName]
-        collection = db[collectionName]
-        result = collection.update_one(query, update)
-        return result.modified_count
 
     @staticmethod
     def insertQuestion(question):
@@ -251,13 +202,6 @@ class MongoUtils:
         documents = collection.find({"priority": {"$gt": priority}})
         return list(documents)
 
-    @staticmethod
-    def deleteAll(collectionName):
-        client = MongoUtils.client
-        db = client[dbName]
-        collection = db[collectionName]
-        result = collection.delete_many({})
-        return result.deleted_count
 
     @staticmethod
     def queryByPriorityLessThan(priority):
@@ -427,12 +371,33 @@ class MongoUtils:
             return result.inserted_id.__str__()
 
     @staticmethod
-    def queryUserNameById(userId):
+    def queryUserNameByUserId(userId):
         client = MongoUtils.client
         db = client[dbName]
         collection = db[chatCollection]
         document = collection.find_one({"user_id": userId})
         return document["user_name"]
+    
+    @staticmethod
+    def queryUserByUserId(userId):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[chatCollection]
+        document  = collection.find_one({"user_id": userId})
+        del document["_id"]
+        return document
+    
+    @staticmethod
+    def insertUser(user):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[chatCollection]
+        
+        if "organization_name" not in user:
+            user["organization_name"] = "knacktohack"
+            
+        result = collection.insert_one(user)
+        return result.inserted_id.__str__()
 
     @staticmethod
     def queryUserIdByName(userName, organizationName="knacktohack"):
@@ -450,7 +415,7 @@ class MongoUtils:
             # create new user set user_id field to random string
             user = {
                 "user_name": userName,
-                "user_id": os.urandom(16).hex(),
+                "user_id": str(os.urandom(16).hex()),
                 "organization_name": organizationName,
             }
             collection.insert_one(user)
@@ -551,7 +516,7 @@ class MongoUtils:
         client = MongoUtils.client
         db = client[dbName]
         collection = db[potentialViolationsCollection]
-        result = collection.delete_one({"_id": id})
+        result = collection.delete_one({"_id": ObjectId(id)})
         return result.deleted_count
     
     
