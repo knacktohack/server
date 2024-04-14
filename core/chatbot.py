@@ -11,13 +11,25 @@ class InMemoryHistory(BaseChatMessageHistory, BaseModel):
 
     def add_messages(self, messages: List[BaseMessage]) -> None:
         """Add a list of messages to the store"""
-        self.messages.extend(messages)
+        
+        outputGuardResponse=checkOutputGuard(messages[1].content)
+        
+        self.messages.append(messages[0])
+        if outputGuardResponse!="safe":
+            self.messages.append(AIMessage("Flagged "+"flagging reason"))
+        else:
+            self.messages.append(messages[1])
+
 
     def clear(self) -> None:
         self.messages = []
-
+ 
 store = {}
 
+
+
+def checkOutputGuard(message):
+    return "safe"
 
 def get_all_sessions(user_id: str) -> List[BaseChatMessageHistory]:
     user_sessions = []
@@ -94,42 +106,59 @@ with_message_history = RunnableWithMessageHistory(
     ],
 )
 
-# resp=with_message_history.invoke(
-#     { "question": "What does cosine mean?"},
-#     config={"configurable": {"user_id": "123", "conversation_id": "1"}}
-# )
 
+  
 
+def getResponseFromLLM(prompt,user_id,conversation_id):
+    response=with_message_history.invoke(
+        { "question": prompt},
+        config={"configurable": {"user_id": user_id, "conversation_id": conversation_id}}
+    )
+    relevantStore= get_session_history(user_id, conversation_id)
+    print(relevantStore.messages)
+    answer=relevantStore.messages[-1].content
+    # print("-----------relevantStore-=---------")
+    # print(relevantStore.messages[-1].content)
+    # print("-----------relevantStoreend-=---------")
+    if answer.split(" ")[0]=="Flagged":
+        return answer,400
+    else:
+        return answer,200
+ 
+     
+   
 
 
  
-@app.route("/generate", methods=["POST"])
-def generate_text():
-    prompt = request.get_json()["prompt"]
-    user_id = request.get_json()["user_id"]  # Get user ID from request
-    print(type(prompt))
-    conversation_id=request.get_json()["conversation_id"]
-    response=with_message_history.invoke(
-    { "question": prompt},
-    config={"configurable": {"user_id": user_id, "conversation_id": conversation_id}}
-)
-    # print(store)
-    return jsonify({"response": response.content, "history": "chat_history"})
+# @app.route("/generate", methods=["POST"])
+# def generate_text():
+#     prompt = request.get_json()["prompt"]
+#     user_id = request.get_json()["user_id"]  # Get user ID from request
+#     # print(type(prompt))
+#     conversation_id=request.get_json()["conversation_id"]
+#     response=with_message_history.invoke(
+#     { "question": prompt},
+#     config={"configurable": {"user_id": user_id, "conversation_id": conversation_id}}
+# )
+#     relevantStore=store[(user_id, conversation_id)]
+#     print(relevantStore)
+#     print()
+#     return jsonify({"response": response.content, "history": "chat_history"})
 
 
-@app.route("/<user_id>/<conversation_id>", methods=["GET"])
-def get_text(user_id,conversation_id):
-    try: 
+# @app.route("/<user_id>/<conversation_id>", methods=["GET"])
+# def get_text(user_id,conversation_id):
+#     try: 
         
-        if user_id is None or conversation_id is None:
-            return jsonify({"error": "Missing user_id or conversation_id"}), 400
-        chat_history = get_session_history(user_id, conversation_id)
-        formatted_messages=format_session_messages(chat_history.messages)
-        response = {"response": formatted_messages}
-        return jsonify(response)
+#         if user_id is None or conversation_id is None:
+#             return jsonify({"error": "Missing user_id or conversation_id"}), 400
+#         chat_history = get_session_history(user_id, conversation_id)
+#         formatted_messages=format_session_messages(chat_history.messages)
+#         response = {"response": formatted_messages}
+#         return jsonify(response)
      
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     app.run(debug=True)

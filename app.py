@@ -8,7 +8,7 @@ import signal
 from dotenv import load_dotenv
 import requests
 from flask import jsonify
-from core.chatbot import get_session_history, format_session_messages,get_all_sessions,with_message_history
+from core.chatbot import get_session_history, format_session_messages,get_all_sessions,with_message_history,getResponseFromLLM 
 import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -168,8 +168,9 @@ def generate_text():
     user_id = request.get_json()["user_id"]  # Get user ID from request
     conversation_id=request.get_json()["conversation_id"]
     # print(type(prompt))
-    questionName,questionScore=PineConeIntegration.getRoute(prompt)
-    flag=RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore)
+    # questionName,questionScore=PineConeIntegration.getRoute(prompt)
+    # flag=RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore)
+    flag=False
     if flag:
         session=get_session_history(user_id,conversation_id)
         session.add_user_message(prompt)
@@ -177,31 +178,29 @@ def generate_text():
         return jsonify({"response": "Sorry this question is blocked as I cannot answer "+questionName, "history": "chat_history","status":400})
         
     else:
-        response=with_message_history.invoke(
-        { "question": prompt},
-        config={"configurable": {"user_id": user_id, "conversation_id": conversation_id}}
-    )
+        response,status=getResponseFromLLM(prompt,user_id,conversation_id)
+        print(response)
     # print(store)
-        return jsonify({"response": response.content, "history": "chat_history","status":200})
+        return jsonify({"response": response, "history": "chat_history","status":status})
 
 
-@app.route("/history/<user_id>", methods=["GET"])
-def get_sessions(user_id):
-    try: 
+# @app.route("/history/<user_id>", methods=["GET"])
+# def get_sessions(user_id):
+#     try: 
         
-        if user_id is None :
-            return jsonify({"error": "Missing user_id"}), 400
-        sessions = get_all_sessions(user_id)
-        print(sessions)
-        formatted_sessions = []
-        for session in sessions:
-            formatted_messages=format_session_messages(session[1].messages)
-            formatted_sessions.append({"conversation_id": session[0], "messages" : formatted_messages})
-        response = {"response": formatted_sessions}
-        return jsonify(response)
+#         if user_id is None :
+#             return jsonify({"error": "Missing user_id"}), 400
+#         sessions = get_all_sessions(user_id)
+#         print(sessions)
+#         formatted_sessions = []
+#         for session in sessions:
+#             formatted_messages=format_session_messages(session[1].messages)
+#             formatted_sessions.append({"conversation_id": session[0], "messages" : formatted_messages})
+#         response = {"response": formatted_sessions}
+#         return jsonify(response)
      
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
     
 @app.route("/history/<user_id>/<conversation_id>", methods=["GET"])
 def get_text(user_id,conversation_id):
@@ -212,6 +211,7 @@ def get_text(user_id,conversation_id):
         chat_history = get_session_history(user_id, conversation_id)
         formatted_messages=format_session_messages(chat_history.messages)
         response = {"response": formatted_messages}
+        print(chat_history.messages)
         return jsonify(response)
      
     except Exception as e:
