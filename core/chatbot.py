@@ -7,6 +7,7 @@ from langchain.prompts import PromptTemplate
 chat = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0)
 from langchain_core.output_parsers import JsonOutputParser
 from langchain.prompts import PromptTemplate
+from .rag.utils import RagIntegration
 
 class OutputGuardResponse(BaseModel):
     risky:bool=Field(description="Is the response risky?")
@@ -124,8 +125,11 @@ prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            "You are a helpful assistant. Answer all questions to the best of your ability.",
+            """You are a helpful assistant. Answer all questions to the best of your ability. Use the context given below
+            {context}
+            """,
         ),
+        
         MessagesPlaceholder(variable_name="history"),
         ("human", "{question}"),
     ]
@@ -133,8 +137,12 @@ prompt = ChatPromptTemplate.from_messages(
 
 
 
+retriever=RagIntegration.getRetriever()
 
-chain = prompt | chat
+print(type(retriever))
+print(retriever)
+# chain =({"context":retriever,"question": RunnablePassthrough()}  | prompt  | chat)
+chain =( prompt  | chat)
 
 with_message_history = RunnableWithMessageHistory(
     chain,
@@ -161,12 +169,13 @@ with_message_history = RunnableWithMessageHistory(
     ],
 )
 
-
+def format_docs(docs):
+    return "\n\n".join([d.page_content for d in docs])
   
 
 def getResponseFromLLM(prompt,user_id,conversation_id):
     response=with_message_history.invoke(
-        { "question": prompt},
+        { "question": prompt,"context":retriever | format_docs},
         config={"configurable": {"user_id": user_id, "conversation_id": conversation_id}}
     )
     relevantStore= get_session_history(user_id, conversation_id)
