@@ -1,6 +1,6 @@
 from ..kors.question_extractor import QuestionExtractor
 from ..question_generation.question_generator import QuestionGenerator
-from ..semantic_router.utils import insertRoute, deleteAll
+from ..semantic_router.utils import insertRoute, deleteAll, deleteRoute
 from ..semantic_router.create_index import createIndex, returnIndex
 import os
 from semantic_router.encoders import OpenAIEncoder
@@ -52,12 +52,16 @@ class PineConeIntegration:
 
     @staticmethod
     def processChunk(chunk: str, organizationId="661a47db428c4cd50785b191"):
+        print(chunk)
         questions = QuestionExtractor.extractQuestions(chunk)
         print(questions)
+        returnQuestions = []
 
+        if len(questions.keys()) == 0:
+            return []
         if len(questions["question_parser"]) == 0:
-            return questions
-        
+            return []
+
         for question in questions["question_parser"][0]["listElement"]:
             vector = encoder(question["question"])[0]
             similarDataScore = PineconeClient.findSimilarVector(vector)
@@ -67,7 +71,7 @@ class PineConeIntegration:
                 generatedQuestions = QuestionGenerator.generateQuestions(
                     question["question"]
                 )
-                MongoUtils.insertQuestion(
+                returnId = MongoUtils.insertQuestion(
                     {
                         "question": question["question"],
                         "organization_id": organizationId,
@@ -75,15 +79,23 @@ class PineConeIntegration:
                         "sample_questions": generatedQuestions,
                     }
                 )
+
+                returnQuestions.append(
+                    {
+                        "question": question["question"],
+                        "organization_id": organizationId,
+                        "priority": question["priority"],
+                        "sample_questions": generatedQuestions,
+                        "id": returnId
+                    }
+                )
                 print(generatedQuestions)
                 insertRoute(question["question"], generatedQuestions)
                 PineconeClient.insertData(
                     [{"question": question["question"], "vector": vector}]
                 )
-
-        return questions
-    
-    
+        print(returnQuestions)
+        return returnQuestions
 
     @staticmethod
     def deleteAll():
@@ -101,3 +113,21 @@ class PineConeIntegration:
     def insertRoute(routeName, utterances):
         insertRoute(routeName, utterances)
         PineConeIntegration.routeLayer = PineConeIntegration.generateRouteLayer()
+
+    @staticmethod
+    def deleteRoute(routeName):
+        MongoUtils.deleteQuestionByName(routeName)
+        PineconeClient.deleteQuestion(routeName)
+        return deleteRoute(routeName)
+    
+    @staticmethod
+    def handlePotentialViolation(potentialViolation,id,accepted=False):
+        if accepted:
+            insertRoute(potentialViolation["question_name"],[potentialViolation["prompt"]])
+            MongoUtils.insertSampleQuestionByQuestionMame(potentialViolation["question_name"],potentialViolation["prompt"])
+        else:
+            pass
+        
+        MongoUtils.deletePotentialViolation(id)
+        return
+        

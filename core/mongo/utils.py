@@ -5,6 +5,7 @@ from datetime import date
 
 load_dotenv()
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 mongoUrl = os.getenv("MONGO_URL")
 dbName = os.getenv("MONGO_DB")
@@ -12,7 +13,7 @@ questionCollection = os.getenv("QUESTION_COLLECTION")
 chatCollection = os.getenv("CHAT_COLLECTION")
 violationCollection = os.getenv("VIOLATION_COLLECTION")
 organizationCollection = os.getenv("ORGANIZATION_COLLECTION")
-blockedPromptCollection = os.getenv("BLOCKED_PROMPT_COLLECTION")
+potentialViolationsCollection = os.getenv("POTENTIAL_VIOLATION_COLLECTION")
 
 """
 question is a dictionary with the following keys
@@ -70,12 +71,12 @@ organization is of the type
     "organization_name": "KnackToHack"
 }
 
-blocked prompt 
+potentialViolations is of the type
 
 {
+    "question_name": "What is the capital of Nigeria?",,
     "prompt": "What is the capital of Nigeria?",
-    "date": "2021-09-01",
-    user_name: "Aditya",
+    "score": 0.8,
 }
 
 """
@@ -149,7 +150,7 @@ class MongoUtils:
         db = client[dbName]
         collection = db[questionCollection]
         result = collection.insert_one(question)
-        return result.inserted_id
+        return result.inserted_id.__str__()
 
     @staticmethod
     def deleteAllQuestions():
@@ -164,7 +165,19 @@ class MongoUtils:
         client = MongoUtils.client
         db = client[dbName]
         collection = db[questionCollection]
-        return collection.find_one({"_id": id})
+        #return the dict
+        document = collection.find_one({
+            "_id": ObjectId(id)
+        })
+        return document
+    
+    @staticmethod
+    def updateQuestionPriorityById(id, priority):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[questionCollection]
+        result = collection.update_one({"_id": ObjectId(id)}, {"$set": {"priority": priority}})
+        return result.modified_count
 
     @staticmethod
     def queryQuestionsByOrganizationId(organizationId):
@@ -191,6 +204,14 @@ class MongoUtils:
         db = client[dbName]
         collection = db[questionCollection]
         result = collection.delete_one({"_id": id})
+        return result.deleted_count
+    
+    @staticmethod
+    def deleteQuestionByName(question):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[questionCollection]
+        result = collection.delete_one({"question": question})
         return result.deleted_count
 
     @staticmethod
@@ -504,3 +525,70 @@ class MongoUtils:
         documents = [document for document in documents]
         documents = removeAndInsertId(documents)
         return list(documents)
+    
+    @staticmethod
+    def queryAllPotentialViolations():
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[potentialViolationsCollection]
+        documents = collection.find({})
+        documents = [document for document in documents]
+        documents = removeAndInsertId(documents)
+        return list(documents)
+    
+    @staticmethod
+    def queryPotentialViolations(questionName):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[potentialViolationsCollection]
+        documents = collection.find({"question_name": questionName})
+        documents = [document for document in documents]
+        documents = removeAndInsertId(documents)
+        return list(documents)
+    
+    @staticmethod
+    def deletePotentialViolation(id):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[potentialViolationsCollection]
+        result = collection.delete_one({"_id": id})
+        return result.deleted_count
+    
+    
+    @staticmethod
+    def insertPotentialViolation(potentialViolation):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[potentialViolationsCollection]
+        result = collection.insert_one(potentialViolation)
+        return result.inserted_id.__str__()
+    
+    
+    @staticmethod
+    def queryQuestionRiskThresholdByQuestionName(questionName):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[questionCollection]
+        document = collection.find_one({"question": questionName})
+        
+        if "threshold" not in document:
+            return 0.82
+        return document["threshold"]
+    
+    @staticmethod
+    def queryPotentialViolationById(id):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[potentialViolationsCollection]
+        document   = collection.find_one({"_id": ObjectId(id)})
+        del document["_id"]
+        return document
+    
+    
+    @staticmethod
+    def insertSampleQuestionByQuestionMame(questionName, sampleQuestion):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[questionCollection]
+        result = collection.update_one({"question": questionName}, {"$push": {"sample_questions": sampleQuestion}})
+        return result.modified_count
