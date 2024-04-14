@@ -15,7 +15,9 @@ from flask_cors import CORS
 from core.azure.blob_storage import uploadToBlobStorage,getAllFilesByOrganizationId
 from pymongo import MongoClient
 from core.mongo.utils import MongoUtils
+from core.integration.pinecone_integration import PineConeIntegration
 from core.MessageTypes import MessageTypes
+from core.risk.utils import RiskIntegration
 load_dotenv()
 app = Flask(__name__)
 # app.config["MONGO_CLIENT"] = MongoClient(os.getenv("MONGO_URL"))
@@ -164,14 +166,23 @@ async def query(q: str):
 def generate_text():
     prompt = request.get_json()["prompt"]
     user_id = request.get_json()["user_id"]  # Get user ID from request
-    print(type(prompt))
     conversation_id=request.get_json()["conversation_id"]
-    response=with_message_history.invoke(
-    { "question": prompt},
-    config={"configurable": {"user_id": user_id, "conversation_id": conversation_id}}
-)
+    # print(type(prompt))
+    questionName,questionScore=PineConeIntegration.getRoute(prompt)
+    flag=RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore)
+    if flag:
+        session=get_session_history(user_id,conversation_id)
+        session.add_user_message(prompt)
+        session.add_ai_message(questionName+"flagged")
+        return jsonify({"response": "Sorry this question is blocked as I cannot answer "+questionName, "history": "chat_history","status":400})
+        
+    else:
+        response=with_message_history.invoke(
+        { "question": prompt},
+        config={"configurable": {"user_id": user_id, "conversation_id": conversation_id}}
+    )
     # print(store)
-    return jsonify({"response": response.content, "history": "chat_history"})
+        return jsonify({"response": response.content, "history": "chat_history","status":200})
 
 
 @app.route("/history/<user_id>", methods=["GET"])
