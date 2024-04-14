@@ -67,7 +67,7 @@ def getAllFilesByOrganizationId(organizationId:str, type = MessageTypes.RULES):
         return {"filename","url"}
         '''
         
-        return [{"file_name":blob.name.split['/'][-1],"url":containerClient.url + "/" +blob.name} for blob in blobs]
+        return [{"file_name":blob.name.split('/')[-1],"url":containerClient.url + "/" +blob.name} for blob in blobs]
     except Exception as e:
         print(e)
         raise e

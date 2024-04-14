@@ -125,7 +125,7 @@ def getRulesFiles():
         return jsonify({"message": "There was an error getting the files"}), 500
     
     
-@app.route("/company_data_files", methods=["POST"])
+@app.route("/data_files", methods=["POST"])
 def getCompanyFiles():
     try:
         organization = "knacktohack"
