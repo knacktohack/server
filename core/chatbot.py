@@ -11,16 +11,17 @@ class InMemoryHistory(BaseChatMessageHistory, BaseModel):
 
     def add_messages(self, messages: List[BaseMessage]) -> None:
         """Add a list of messages to the store"""
-        
-        outputGuardResponse=checkOutputGuard(messages[1].content)
-        
-        self.messages.append(messages[0])
-        if outputGuardResponse!="safe":
-            self.messages.append(AIMessage("Flagged "+"flagging reason"))
+        if len(messages)==2:
+            outputGuardResponse=checkOutputGuard(messages[1].content)
+            self.messages.append(messages[0])
+            if outputGuardResponse!="safe":
+                self.messages.append(AIMessage("Flagged "+"flagging reason"))
+            else:
+                self.messages.append(messages[1])
         else:
-            self.messages.append(messages[1])
+            self.messages.extend(messages)
 
-
+ 
     def clear(self) -> None:
         self.messages = []
  
