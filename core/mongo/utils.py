@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from datetime import date
 
 load_dotenv()
@@ -12,6 +12,7 @@ questionCollection = os.getenv("QUESTION_COLLECTION")
 chatCollection = os.getenv("CHAT_COLLECTION")
 violationCollection = os.getenv("VIOLATION_COLLECTION")
 organizationCollection = os.getenv("ORGANIZATION_COLLECTION")
+blockedPromptCollection = os.getenv("BLOCKED_PROMPT_COLLECTION")
 
 """
 question is a dictionary with the following keys
@@ -21,7 +22,8 @@ question is a dictionary with the following keys
     "organization_id": "12345"
     "sample_questions: [
         
-    ]
+    ],
+    "threshold":0.82
 }
 
 users
@@ -54,7 +56,7 @@ violation is a dictionary with the following keys
 
 {
     "user_id": "12345",
-    "organization_id": "12345",
+    "organization_name": "12345",
     "conversation_id": "12345",
     "violation_question": "What is the capital of Nigeria?",
     "violation_priority": 5,
@@ -68,13 +70,24 @@ organization is of the type
     "organization_name": "KnackToHack"
 }
 
+blocked prompt 
+
+{
+    "prompt": "What is the capital of Nigeria?",
+    "date": "2021-09-01",
+    user_name: "Aditya",
+}
+
 """
+
+
 def removeAndInsertId(documents):
     for document in documents:
         if "_id" in document:
             document["id"] = document["_id"].__str__()
             del document["_id"]
     return documents
+
 
 class MongoUtils:
     client = MongoClient(mongoUrl)
@@ -137,8 +150,7 @@ class MongoUtils:
         collection = db[questionCollection]
         result = collection.insert_one(question)
         return result.inserted_id
-    
-    
+
     @staticmethod
     def deleteAllQuestions():
         client = MongoUtils.client
@@ -146,25 +158,33 @@ class MongoUtils:
         collection = db[questionCollection]
         result = collection.delete_many({})
         return result.deleted_count
-    
+
     @staticmethod
     def queryQuestionById(id):
         client = MongoUtils.client
         db = client[dbName]
         collection = db[questionCollection]
         return collection.find_one({"_id": id})
-    
+
     @staticmethod
     def queryQuestionsByOrganizationId(organizationId):
         client = MongoUtils.client
         db = client[dbName]
         collection = db[questionCollection]
         documents = collection.find({"organization_id": organizationId})
-        
-        #remove object id and put id as a json key
+
+        # remove object id and put id as a json key
         documents = removeAndInsertId(documents)
         return list(documents)
-    
+
+    @staticmethod
+    def getPriorityByQuestionName(question):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[questionCollection]
+        document = collection.find_one({"question": question})
+        return document["priority"]
+
     @staticmethod
     def deleteQuestion(id):
         client = MongoUtils.client
@@ -172,8 +192,7 @@ class MongoUtils:
         collection = db[questionCollection]
         result = collection.delete_one({"_id": id})
         return result.deleted_count
-    
-    
+
     @staticmethod
     def updateQuestion(id, question):
         client = MongoUtils.client
@@ -181,7 +200,7 @@ class MongoUtils:
         collection = db[questionCollection]
         result = collection.update_one({"_id": id}, {"$set": question})
         return result.modified_count
-    
+
     @staticmethod
     def queryAllQuestions():
         client = MongoUtils.client
@@ -226,17 +245,19 @@ class MongoUtils:
         collection = db[questionCollection]
         documents = collection.find({"priority": {"$lt": priority}})
         return list(documents)
-    
-    
+
     @staticmethod
     def queryByQuestionAndOrganizationId(question, organizationId):
         client = MongoUtils.client
         db = client[dbName]
         collection = db[questionCollection]
         documents = collection.find(
-            {"question": {"$regex": question, "$options": "i"}, "organization_id": organizationId}
+            {
+                "question": {"$regex": question, "$options": "i"},
+                "organization_id": organizationId,
+            }
         )
-        
+
         for document in documents:
             document["id"] = document["_id"]
             del document["_id"]
@@ -359,7 +380,7 @@ class MongoUtils:
             }
         )
         return list(documents)
-    
+
     @staticmethod
     def insertOrganization(organization):
         client = MongoUtils.client
@@ -367,26 +388,23 @@ class MongoUtils:
         collection = db[organizationCollection]
         result = collection.insert_one(organization)
         return result.inserted_id
-    
+
     @staticmethod
     def queryOrganizationIdByName(organizationName):
         client = MongoUtils.client
         db = client[dbName]
         collection = db[organizationCollection]
-        document  = collection.find_one({"organization_name": organizationName})
-        
+        document = collection.find_one({"organization_name": organizationName})
+
         if document:
             return document["_id"].__str__()
-        
+
         else:
-            #create new organization
-            organization = {
-                "organization_name": organizationName
-            }
+            # create new organization
+            organization = {"organization_name": organizationName}
             result = collection.insert_one(organization)
             return result.inserted_id.__str__()
-        
-        
+
     @staticmethod
     def queryUserNameById(userId):
         client = MongoUtils.client
@@ -394,24 +412,95 @@ class MongoUtils:
         collection = db[chatCollection]
         document = collection.find_one({"user_id": userId})
         return document["user_name"]
-    
+
     @staticmethod
     def queryUserIdByName(userName, organizationName="knacktohack"):
         client = MongoUtils.client
         db = client[dbName]
         collection = db[chatCollection]
-        document = collection.find_one({"user_name": userName, "organization_name": organizationName})
-        
+        document = collection.find_one(
+            {"user_name": userName, "organization_name": organizationName}
+        )
+
         if document:
             return document["user_id"]
-        
+
         else:
-            #create new user set user_id field to random string
+            # create new user set user_id field to random string
             user = {
                 "user_name": userName,
                 "user_id": os.urandom(16).hex(),
-                "organization_name": organizationName
+                "organization_name": organizationName,
             }
             collection.insert_one(user)
             return user["user_id"]
-            
+
+    @staticmethod
+    def insertViolation(violation):
+        client = MongoUtils.client
+
+        # set current date for violation
+        violation["date"] = datetime.now().strftime("%Y-%m-%d")
+
+        if "organization_name" not in violation:
+            violation["organization_name"] = "knacktohack"
+
+        db = client[dbName]
+        collection = db[violationCollection]
+        result = collection.insert_one(violation)
+        return result.inserted_id
+
+    @staticmethod
+    def queryViolationByUserIdAndOrganizationName(
+        userId, organizationName="knacktohack"
+    ):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[violationCollection]
+        documents = collection.find(
+            {"user_id": userId, "organization_name": organizationName}
+        )
+        documents = [document for document in documents]
+        documents = removeAndInsertId(documents)
+        return list(documents)
+
+    @staticmethod
+    def insertViolation(
+        userId, conversationId, questionName, score, organizationName="knacktohack"
+    ):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[violationCollection]
+
+        priority = MongoUtils.getPriorityByQuestionName(questionName)
+
+        violation = {
+            "user_id": userId,
+            "conversation_id": conversationId,
+            "violation_question": questionName,
+            "score": score,
+            "violation_priority": priority,
+            "date": date.today().__str__(),
+            "organization_name": organizationName,
+        }
+
+        result = collection.insert_one(violation)
+        return result.inserted_id
+
+    @staticmethod
+    def queryViolationsByUserIdAndOrganizationNameAndDateBefore(
+        userId,  days=1,organizationName="knacktohack"
+    ):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[violationCollection]
+        documents = collection.find(
+            {
+                "user_id": userId,
+                "organization_name": organizationName,
+                "date": {"$gte": (date.today() - timedelta(days=days)).__str__()},
+            }
+        )
+        documents = [document for document in documents]
+        documents = removeAndInsertId(documents)
+        return list(documents)

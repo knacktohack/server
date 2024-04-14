@@ -205,6 +205,15 @@ def get_text(user_id,conversation_id):
      
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+    
+@app.route("/insert_question_sample",methods=["POST"])
+def insert_question_sample():
+    try:
+        questionId = request.get_json()["id"]
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/questions", methods=["POST"])
 def get_question():
