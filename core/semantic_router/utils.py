@@ -22,6 +22,11 @@ def insertRoute(routeName,utterances):
     return index.add(embeddings=vectors,routes = routes, utterances=utterances)
 
 
+def deleteRoute(routeName):
+    index = returnIndex(indexName)
+    return index.delete(routeName)
+
+
 def deleteAll():
     index = returnIndex(indexName)
     return index.delete_all()

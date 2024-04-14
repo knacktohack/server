@@ -108,3 +108,10 @@ class PineconeClient:
         PineconeClient._get_client()
         index = PineconeClient._client.Index(indexName)
         index.delete(delete_all=True)
+        
+        
+    @staticmethod
+    def deleteQuestion(question):
+        PineconeClient._get_client()
+        index = PineconeClient._client.Index(indexName)
+        index.delete(ids=[question])

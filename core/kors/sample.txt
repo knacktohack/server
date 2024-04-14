@@ -18,8 +18,7 @@ laptops, or any device capable of computing and storing company data or has acce
 the company's networks or systems and are used in this sense.
  III. Principles 
 
-Using privately owned digital devices is optional and employees are free to choose the
-appropriate means and tools by which they fulfill their work assignments.
+Using privately owned digital devices is optional and employees are free to choose the appropriate means and tools by which they fulfill their work assignments.
 
 
 Regardless of what devices are being used, employees must ensure the minimum set of
@@ -33,8 +32,7 @@ the security requirements may be time consuming and goes against the nature of a
 extreme or urgent situation. Such cases must be notified to the IT Department.
 
 
-In case of any suspicious activity, loss of access or loss of data, employees must notify
-the IT Department.
+In case of any suspicious activity, loss of access or loss of data, employees must notify the IT Department.
 
 IV. Physical security requirements It is strongly discouraged to use any devices (privately-owned or not) for any
 work-related tasks using a public internet connection.

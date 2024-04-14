@@ -23,6 +23,7 @@ class QuestionExtractor:
         model_name="gpt-3.5-turbo",
         temperature=0,
         openai_api_key=openApiKey,
+        max_tokens=1000,
     )
     
     chain = create_extraction_chain(llm, schema,encoder_or_encoder_class="JSON",input_formatter=None)

@@ -19,10 +19,10 @@ schema = Object(
     id="question_parser",
     description="""A paragraph of rules or regulations are provided.
     Find the rules in the paragraph pertaining to employee conduct and security.
-    Questions are to be generated which would reflect the kinds of questions that would be asked by a malicious employee trying to circumvent or go againt any of these rules.
+    Questions are to be generated which would reflect the kinds of questions that would be asked by an employee trying to circumvent or go againt one or more of these rules.
+    You MUST EXTRACT some question, no matter how irrelevant they seem.
     The questions should be generated in an indirect way. NOTE - Consider all aspects in which the rule may be violated.
-    Generate a maximum of 3 most relevant questions
-    If you find more than 3 questions, try to merge similar questions into one""",
+    Extract a maxiumum of 3 most relevant questions from the paragraph.""",
     attributes=[listElement],
     examples=[
         (
@@ -82,13 +82,35 @@ schema = Object(
             },
         ),
         (
-            "laptop is banned",
+            "Employees must not reveal any personally identifiable information (PII) of any other employee or customer",
             {
                 "listElement": [
-                    {"question": "Questions about using a laptop", "priority": 5}
+                    {
+                        "question": "Questions about revealing a customer's phone number",
+                        "priority": 9,
+                    },
+                    {
+                        "question": "Questions about revealing a customer's email address",
+                        "priority": 9,
+                    },
+                    {
+                        "question": "Questions about revealing a customer's address",
+                        "priority": 9,
+                    },
                 ]
             },
         ),
+        (
+            "Insider trading is not allowed",
+            {
+                "listElement": [
+                    {
+                        "question": "Questions about insider trading",
+                        "priority": 10,
+                    }
+                ]
+            },
+        )
     ],
     many=True,
 )

@@ -147,6 +147,16 @@ def getCompanyFiles():
         return jsonify({"message": "There was an error getting the files"}), 500
         
         
+@app.route("/questions_delete",methods=['POST'])
+def delete_question():
+    try:
+        body = request.get_json()
+        question = body["question"]
+        PineConeIntegration.deleteRoute(question)
+        return jsonify({"message": "Successfully deleted question"}),200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+        
 
 
 @app.get("/query")
@@ -169,7 +179,7 @@ def generate_text():
     conversation_id=request.get_json()["conversation_id"]
     print(type(prompt))
     questionName,questionScore=PineConeIntegration.getRoute(prompt)
-    flag=RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore)
+    flag=RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore,prompt)
     if flag:
         session=get_session_history(user_id,conversation_id)
         session.add_user_message(prompt)
@@ -264,37 +274,46 @@ def insert_question():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@app.route("/questions", methods=["POST", "PUT", "PATCH"])
+@app.route("/questions_update", methods=["PUT", "PATCH"])
 def update_question():
     try:
         body = request.get_json()
         id  = body["id"]
+        MongoUtils.updateQuestionPriorityById(id, body["priority"])
         
-        oldQuestion = MongoUtils.queryQuestionById(id)
-        
-        question = {
-            "question": body["question"] if body["question"] else oldQuestion["question"],
-            "organization_id": body["organization_id"] if body["organization_id"] else oldQuestion["organization_id"],
-            "priority": body["priority"] if body["priority"] else oldQuestion["priority"]
-        }
-        
-        cnt = MongoUtils.updateQuestion(id, question)
-        
-        return jsonify({"message": f"Updated {cnt} record"})
-     
+        return jsonify({"message": f"Updated record"})
+    
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/questions/<id>", methods=["DELETE"])
-def delete_question():
-    try: 
-        id = request.get_json()["id"]
-        cnt = MongoUtils.deleteQuestion(id)
-        
-        return jsonify({"message": f"Deleted {cnt} record"})
-     
+
+@app.route("/rules_add", methods=["POST"])
+def add_question():
+    try:
+        body = request.get_json()
+        question = body["rule"]
+        print(question)
+        questions = PineConeIntegration.processChunk(question)
+    
+        return jsonify(questions)
+    
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+     
+    # except Exception as e:
+    #     return jsonify({"error": str(e)}), 500
+
+# @app.route("/questions/<id>", methods=["DELETE"])
+# def delete_question():
+#     try: 
+#         id = request.get_json()["id"]
+#         cnt = MongoUtils.deleteQuestion(id)
+        
+#         return jsonify({"message": f"Deleted {cnt} record"})
+     
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 
 
