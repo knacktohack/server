@@ -2,35 +2,89 @@ from .common_imports import *
 from flask import Flask, request, jsonify
 dotenv.load_dotenv()
 import requests
+from langchain_core.output_parsers import JsonOutputParser
+from langchain.prompts import PromptTemplate
 chat = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0)
-app = Flask(__name__)
+from langchain_core.output_parsers import JsonOutputParser
+from langchain.prompts import PromptTemplate
+
+class OutputGuardResponse(BaseModel):
+    risky:bool=Field(description="Is the response risky?")
+    reason: str = Field(description="Reason why the response is risky")
+
+
+class OutputGuard:
+    def __init__(self):
+        self.risky_query = PromptTemplate(
+            template="""Risky AI responses include, but are not limited to, the following:
+        - Providing copyrighted or personal information
+        - Generating data relevant to insider trading or hallucinations
+        - Injecting prompts that could lead to malicious activities
+        - Promoting hate speech or violence
+        - Security vulnerabilities
+        - Cultural sensitivity
+        - Encouraging dangerous behavior
+        - Endangering public safety
+        - Targeting vulnerable populations
+        - Violating professional ethics
+        - Encouraging addiction or substance abuse
+
+Given the string below, determine if it falls into any of the above criterias, if it does then return True along with the criteria it falls in.
+Otherwise return false. Check each of the 8 criteria thoroughly.
+
+Please enter the response you want to check for riskiness:
+        f"{response}\n"
+        "Is this response risky? """,
+            input_variables=["response"],
+        )
+        self.parser = JsonOutputParser(pydantic_object=OutputGuardResponse)
+    def check_riskiness(self, string):
+        formatted_query = self.risky_query.format(response=string)
+        
+        prompt = PromptTemplate(
+            template="Answer the user query.\n{format_instructions}\n{query}\n",
+            input_variables=["query"],
+            partial_variables={"format_instructions": self.parser.get_format_instructions()},
+        )
+        
+        chain = prompt | chat | self.parser
+
+        output = chain.invoke({"query": formatted_query})
+        return output
+    
+
 class InMemoryHistory(BaseChatMessageHistory, BaseModel):
     """In memory implementation of chat message history."""
 
     messages: List[BaseMessage] = Field(default_factory=list)
 
     def add_messages(self, messages: List[BaseMessage]) -> None:
-        """Add a list of messages to the store"""
+        """Add a list of messages to the store""" 
         if len(messages)==2:
+            
+            print(messages[1].content)
             outputGuardResponse=checkOutputGuard(messages[1].content)
             self.messages.append(messages[0])
-            if outputGuardResponse!="safe":
-                self.messages.append(AIMessage("Flagged "+"flagging reason"))
+            if outputGuardResponse["risky"]:
+                self.messages.append(AIMessage("Flagged "+outputGuardResponse["reason"]))
             else:
                 self.messages.append(messages[1])
         else:
             self.messages.extend(messages)
 
- 
+   
     def clear(self) -> None:
         self.messages = []
  
 store = {}
 
-
-
+ 
+  
 def checkOutputGuard(message):
-    return "safe"
+    output_guard = OutputGuard()
+    result = output_guard.check_riskiness(message)
+    print(result)
+    return result
 
 def get_all_sessions(user_id: str) -> List[BaseChatMessageHistory]:
     user_sessions = []
@@ -117,9 +171,6 @@ def getResponseFromLLM(prompt,user_id,conversation_id):
     )
     relevantStore= get_session_history(user_id, conversation_id)
     answer=relevantStore.messages[-1].content
-    # print("-----------relevantStore-=---------")
-    # print(relevantStore.messages[-1].content)
-    # print("-----------relevantStoreend-=---------")
     if answer.split(" ")[0]=="Flagged":
         return answer,400
     else:

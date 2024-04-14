@@ -168,8 +168,9 @@ def generate_text():
     user_id = request.get_json()["user_id"]  # Get user ID from request
     conversation_id=request.get_json()["conversation_id"]
     print(type(prompt))
-    questionName,questionScore=PineConeIntegration.getRoute(prompt)
-    flag=RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore)
+    # questionName,questionScore=PineConeIntegration.getRoute(prompt) 
+    # flag=RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore)
+    flag=False
     if flag:
         session=get_session_history(user_id,conversation_id)
         session.add_user_message(prompt)
