@@ -15,6 +15,7 @@ from flask_cors import CORS
 from core.azure.blob_storage import uploadToBlobStorage,getAllFilesByOrganizationId
 from pymongo import MongoClient
 from core.mongo.utils import MongoUtils
+from core.MessageTypes import MessageTypes
 load_dotenv()
 app = Flask(__name__)
 # app.config["MONGO_CLIENT"] = MongoClient(os.getenv("MONGO_URL"))
@@ -63,7 +64,7 @@ def uploadRulesToBlobStorage():
         fileData = uploadedFile.read()
 
         # Call the upload function
-        uploadToBlobStorage(fileData, fileName,organizationId,type="rules_upload")
+        uploadToBlobStorage(fileData, fileName,organizationId,type=MessageTypes.RULES)
 
         return jsonify({"message": f"Successfully uploaded {fileName} to Azure Blob Storage"})
     except Exception as e:
@@ -91,7 +92,7 @@ def uploadCompanyDataToBlobStorage():
         fileData = uploadedFile.read()
 
         # Call the upload function
-        uploadToBlobStorage(fileData, fileName,organizationId,type="company_documents_upload")
+        uploadToBlobStorage(fileData, fileName,organizationId,type=MessageTypes.DATA)
 
         return jsonify({"message": f"Successfully uploaded {fileName} to Azure Blob Storage"})
     except Exception as e:
@@ -100,8 +101,8 @@ def uploadCompanyDataToBlobStorage():
     
     
     
-@app.route("/files", methods=["POST"])
-def getFiles():
+@app.route("/rules_files", methods=["POST"])
+def getRulesFiles():
     try:
         organization = "knacktohack"
         #check request.body as json for organization
@@ -112,7 +113,29 @@ def getFiles():
             
         organizationId = MongoUtils.queryOrganizationIdByName(organization)
         print(organizationId)
-        files = getAllFilesByOrganizationId(organizationId)
+        files = getAllFilesByOrganizationId(organizationId, MessageTypes.RULES)
+        
+        return jsonify(files)
+    
+
+    except Exception as e:
+        print(e)
+        return jsonify({"message": "There was an error getting the files"}), 500
+    
+    
+@app.route("/company_data_files", methods=["POST"])
+def getCompanyFiles():
+    try:
+        organization = "knacktohack"
+        #check request.body as json for organization
+        body = request.get_json()
+        print(body)
+        if "organization" in body:
+            organization = body["organization"]
+            
+        organizationId = MongoUtils.queryOrganizationIdByName(organization)
+        print(organizationId)
+        files = getAllFilesByOrganizationId(organizationId, MessageTypes.DATA)
         
         return jsonify(files)
     

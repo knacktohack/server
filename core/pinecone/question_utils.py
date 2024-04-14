@@ -106,4 +106,5 @@ class PineconeClient:
     def deleteAll():
         # just delete all data from index
         PineconeClient._get_client()
-        PineconeClient._client.delete_index(indexName)
+        index = PineconeClient._client.Index(indexName)
+        index.delete(delete_all=True)

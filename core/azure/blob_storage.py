@@ -5,16 +5,19 @@ import uuid
 from dotenv import load_dotenv
 load_dotenv()
 from .message_queue import publishToChunkingQueue
+from ..MessageTypes import MessageTypes
 
 connectionString = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 containerName = os.getenv("AZURE_STORAGE_CONTAINER_NAME")
 
-def uploadToBlobStorage(data,fileName,organizationId="knacktohack",type="rules_upload"):
+def uploadToBlobStorage(data,fileName,organizationId="knacktohack",type=MessageTypes.RULES):
     try:
         blobServiceClient = BlobServiceClient.from_connection_string(connectionString)
         containerClient = blobServiceClient.get_container_client(container=containerName)
         
-        subFolderName = organizationId + "/"
+        subFolderName = type + "_" + organizationId + "/"
+            
+            
         blobClient = containerClient.get_blob_client(blob = subFolderName)
         
         if not blobClient.exists():
@@ -39,7 +42,7 @@ def uploadToBlobStorage(data,fileName,organizationId="knacktohack",type="rules_u
         raise e
     
     
-def getAllFiles():
+def getAllFiles(type = MessageTypes.RULES):
     try:
         blobServiceClient = BlobServiceClient.from_connection_string(connectionString)
         containerClient = blobServiceClient.get_container_client(containerName)
@@ -50,13 +53,13 @@ def getAllFiles():
         raise e
     
     
-def getAllFilesByOrganizationId(organizationId:str):
+def getAllFilesByOrganizationId(organizationId:str, type = MessageTypes.RULES):
     try:
         #subfolder named organizationId
         blobServiceClient = BlobServiceClient.from_connection_string(connectionString)
         containerClient = blobServiceClient.get_container_client(containerName)
         
-        subFolderName = organizationId + "/"
+        subFolderName = type + "_" + organizationId + "/"
         
         blobs = containerClient.list_blobs(name_starts_with=subFolderName)
         

@@ -51,8 +51,7 @@ physical access is unrestricted to unauthorized people.
  V. Remote access and authentication It is prohibited to use any public networks for work. In case of necessity, access to company's resources and system in public areas must be done on mobile private networks (hotspot) and only while using the company approved VPN.
 
 
-Employees must have two factor authentication enabled on every application & service
-that offers it.
+Employees must have two factor authentication enabled on every application & service that offers it.
 
 
 While working remotely, on company or privately owned devices, employees must

@@ -55,21 +55,27 @@ class PineConeIntegration:
         questions = QuestionExtractor.extractQuestions(chunk)
         print(questions)
 
+        if len(questions["question_parser"]) == 0:
+            return questions
+        
         for question in questions["question_parser"][0]["listElement"]:
             vector = encoder(question["question"])[0]
             similarDataScore = PineconeClient.findSimilarVector(vector)
 
             if similarDataScore < 0.85:
+                print(question)
+                generatedQuestions = QuestionGenerator.generateQuestions(
+                    question["question"]
+                )
                 MongoUtils.insertQuestion(
                     {
                         "question": question["question"],
                         "organization_id": organizationId,
                         "priority": question["priority"],
+                        "sample_questions": generatedQuestions,
                     }
                 )
-                generatedQuestions = QuestionGenerator.generateQuestions(
-                    question["question"]
-                )
+                print(generatedQuestions)
                 insertRoute(question["question"], generatedQuestions)
                 PineconeClient.insertData(
                     [{"question": question["question"], "vector": vector}]

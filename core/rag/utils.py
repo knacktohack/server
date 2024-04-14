@@ -22,7 +22,7 @@ class RagIntegration:
     
     @staticmethod
     def getRetriever():
-        return RagIntegration.vectorStore.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": 0.8})
+        return RagIntegration.vectorStore.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": 0.9})
     
     @staticmethod
     def addDocumentWithUrl(pdfUrl: str):

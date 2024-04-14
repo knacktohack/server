@@ -1,9 +1,13 @@
-from azure.eventhub import EventHubProducerClient, EventData, EventHubConsumerClient, PartitionContext,EventHubSharedKeyCredential
-from azure.servicebus import ServiceBusClient, ServiceBusMessage
+from azure.eventhub import EventHubProducerClient, EventData
+from azure.servicebus import ServiceBusClient
 import os
 from dotenv import load_dotenv
 import time
 import json
+from ..MessageTypes import MessageTypes
+from ..chunker import getChunksFromFiles
+from ..integration.pinecone_integration import PineConeIntegration
+from ..rag.utils import RagIntegration
 
 load_dotenv()
 queueConnectionString = os.getenv("AZUE_QUEUE_CONNECTION_STRING")
@@ -82,7 +86,7 @@ def loop(queueName, callback=print,timeInMinutes: int = 0.1,maxMessages=10,delet
     
 
 
-def loopForChunkingQueue(timeInMinutes: int = 0.1,deleteMessage=False) -> None:
+def loopForChunkingQueue(timeInMinutes: int = 2,deleteMessage=False) -> None:
     """
     Continuously polls the Azure Chunking Queue at a specified interval.
 
@@ -90,4 +94,18 @@ def loopForChunkingQueue(timeInMinutes: int = 0.1,deleteMessage=False) -> None:
         timeInMinutes (int, optional): The interval between polls in minutes. Defaults to 10.
         **kwargs: Additional arguments passed to pollForMessages function.
     """
-    loop(queueName=chunkingQueueName, timeInMinutes=timeInMinutes, deleteMessage=deleteMessage)
+    
+    def callback(messages):
+        print(messages)
+        for message in messages:
+            if message['type'] == MessageTypes.RULES:
+                chunks = getChunksFromFiles(message['url'],chunk_size=1000)
+                for chunk in chunks['chunks']:
+                    PineConeIntegration.processChunk(chunk)
+                    
+            elif message['type'] == MessageTypes.DATA:
+                chunks = getChunksFromFiles(message['url'],chunk_size=500)
+                for chunk in chunks['chunks']:
+                    RagIntegration.addText(chunk)
+                
+    loop(queueName=chunkingQueueName, timeInMinutes=timeInMinutes, deleteMessage=deleteMessage, callback=callback)

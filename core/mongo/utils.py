@@ -19,6 +19,9 @@ question is a dictionary with the following keys
     "question": "What is the capital of Nigeria?",
     "priority": 0.5,
     "organization_id": "12345"
+    "sample_questions: [
+        
+    ]
 }
 
 chats is a dictionary with the following keys
@@ -125,6 +128,15 @@ class MongoUtils:
         collection = db[questionCollection]
         result = collection.insert_one(question)
         return result.inserted_id
+    
+    
+    @staticmethod
+    def deleteAllQuestions():
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[questionCollection]
+        result = collection.delete_many({})
+        return result.deleted_count
     
     @staticmethod
     def queryQuestionById(id):

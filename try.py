@@ -15,10 +15,10 @@
 
 # # from core.semantic_router.create_index import createIndex
 # # from core.semantic_router.utils import insertRoute,deleteAll
-# # from core.question_generation.question_generator import QuestionGenerator
+from core.question_generation.question_generator import QuestionGenerator
 from core.integration.pinecone_integration import PineConeIntegration
 # # # from core.chunker import getChunksFromFiles
-# # from core.kors.question_extractor import QuestionExtractor
+from core.kors.question_extractor import QuestionExtractor
 # # from core.rag.utils import RagIntegration
 # from core.azure.blob_storage import uploadToBlobStorage,getAllFiles
 from core.azure.message_queue import publishToChunkingQueue,loopForChunkingQueue
@@ -89,7 +89,7 @@ if __name__ == "__main__":
 #     # print(QuestionExtractor.extractQuestions(text))    
 #     # print(RagIntegration.addDocumentWithUrl(text))
 #     # uploadToBlobStorage("/Users/adityaganguly/college/MG/sample1.pdf","sample1.pdf")
-#     # loopForChunkingQueue(deleteMessage=False)
+    # loopForChunkingQueue(deleteMessage=True)
 #     # publishToChunkingQueue({"url":"https://knacktohackstorage.blob.core.windows.net/chunked/sample.pdf"})
 #     print(getAllFiles())
 #     PineConeIntegration.processChunk(text)
@@ -98,14 +98,19 @@ if __name__ == "__main__":
     # print(MongoUtils.queryByPriorityGreaterThan(8))
     # print("Hello")
     # loopForChunkingQueue(deleteMessage=True)
+    print(MongoUtils.queryAllQuestions())
     # while True:
     #     inp = input("Enter the text: ")
     #     print(PineConeIntegration.getRoute(inp))
     
     # text = input("Enter the text: ")
+    # print(QuestionGenerator.generateQuestions(text,True))
     # PineConeIntegration.processChunk(text)
-    print(MongoUtils.queryAllQuestions())
+    # print(MongoUtils.queryAllQuestions())
     # PineconeClient.createIndex()
+    # PineconeClient.deleteAll()
+    # MongoUtils.deleteAllQuestions()
+    # PineConeIntegration.deleteAll()
 
 
 # client = MongoClient("mongodb+srv://amartya:6411@cluster0.kvdsk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")

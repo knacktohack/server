@@ -25,19 +25,19 @@ class QuestionGenerator:
     )
     
     template = PromptTemplate(template = """
-        You are given a question template, that is a superset of a class of questions that cen be asked.
-        You job is to generate 3 different ways that a user might ask a question that fits into this category.
-        The template references some activity, and the user is asking a question about performing that activity.
+        You are given a question template, that is a superset of a class of questions that can be asked.
+        You job is to generate 5 different ways that a user might ask a question that fits into this category.
+        The template references some activity, and the user is asking a question about PERFORMING that activity.
         Consider cases where the user may ask an INDIRECT question.
-        Consider ALL ASPECTS of how the user may ask a question.
+        Consider ALL ASPECTS of how the user perform this activity.
         Avoid generating REPETITIVE questions.
         The generated questions should appear NATURAL. Output each of the generated questions on a NEW LINE.
         Do not include any additional information.
         Use the following context
         
-        Context - {context}
+        CONTEXT - {context}
         
-        Question - {original_question}
+        QUESTION - {original_question}
     """,
        input_variables=["original_question"])
     
@@ -47,15 +47,29 @@ class QuestionGenerator:
     parser = StrOutputParser()
     
     @staticmethod
-    def generateQuestions(original_question: str):
-        # filled_template = QuestionGenerator.template.format(original_question=original_question)    
-        chain = (
-            {"context":QuestionGenerator.retriever, "original_question":RunnablePassthrough()}
-            | QuestionGenerator.template
-            | QuestionGenerator.llm
-            | QuestionGenerator.parser
-        )
-        output = chain.invoke(original_question)
+    def generateQuestions(original_question: str,context=True):
+        # filled_template = QuestionGenerator.template.format(original_question=original_question)
+        
+        if context:
+            chain = (
+                {"context":QuestionGenerator.retriever, "original_question":RunnablePassthrough()}
+                | QuestionGenerator.template
+                | QuestionGenerator.llm
+                | QuestionGenerator.parser
+            )    
+            
+            output = chain.invoke(original_question)
+        else:
+            chain = (
+                QuestionGenerator.template
+                | QuestionGenerator.llm
+                | QuestionGenerator.parser
+            )
+            
+            output = chain.invoke({
+                "context": "",
+                "original_question": original_question
+            })
         
         #split by newlines
         output = output.split("\n")
