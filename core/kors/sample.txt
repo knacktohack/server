@@ -69,10 +69,10 @@ such channels, security risks are diminished.
 
 
 
-OpenLM may introduce a solution to secure and control endpoint devices. The goal is to
+Comapny may introduce a solution to secure and control endpoint devices. The goal is to
 enforce security configurations, auto patching, password requirements,screen-lock,
-remote wipe capabilities and deployment of additional policies. Remote workers shall connect to OpenLM resources & infrastructure only by VPN. The
-solution provided by the company is OpenVPN.
+remote wipe capabilities and deployment of additional policies. Remote workers shall connect to Comapany resources & infrastructure only by VPN. The
+solution provided by the company is CompanyVPN.
 
 
 

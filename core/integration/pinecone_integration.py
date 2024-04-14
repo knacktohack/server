@@ -62,7 +62,7 @@ class PineConeIntegration:
             vector = encoder(question["question"])[0]
             similarDataScore = PineconeClient.findSimilarVector(vector)
 
-            if similarDataScore < 0.85:
+            if similarDataScore < 0.90:
                 print(question)
                 generatedQuestions = QuestionGenerator.generateQuestions(
                     question["question"]
@@ -95,7 +95,7 @@ class PineConeIntegration:
             PineConeIntegration.routeLayer = PineConeIntegration.generateRouteLayer()
         vector = PineConeIntegration.routeLayer._encode(text)
         route, score = PineConeIntegration.routeLayer._retrieve_top_route(vector=vector)
-        return route, score
+        return route.name, max(score)
 
     @staticmethod
     def insertRoute(routeName, utterances):

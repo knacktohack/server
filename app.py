@@ -229,7 +229,7 @@ def insert_question():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@app.route("/questions/<id>", methods=["POST", "PUT", "PATCH"])
+@app.route("/questions", methods=["POST", "PUT", "PATCH"])
 def update_question():
     try:
         body = request.get_json()

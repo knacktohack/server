@@ -24,6 +24,14 @@ question is a dictionary with the following keys
     ]
 }
 
+users
+
+{
+    user_name: "Aditya",
+    user_id: "12345",
+    organization_name: "12345"
+}
+
 chats is a dictionary with the following keys
 
 {
@@ -50,6 +58,7 @@ violation is a dictionary with the following keys
     "conversation_id": "12345",
     "violation_question": "What is the capital of Nigeria?",
     "violation_priority": 5,
+    "score":0.8,
     "date": "2021-09-01"
 }
 
@@ -376,3 +385,33 @@ class MongoUtils:
             }
             result = collection.insert_one(organization)
             return result.inserted_id.__str__()
+        
+        
+    @staticmethod
+    def queryUserNameById(userId):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[chatCollection]
+        document = collection.find_one({"user_id": userId})
+        return document["user_name"]
+    
+    @staticmethod
+    def queryUserIdByName(userName, organizationName="knacktohack"):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[chatCollection]
+        document = collection.find_one({"user_name": userName, "organization_name": organizationName})
+        
+        if document:
+            return document["user_id"]
+        
+        else:
+            #create new user set user_id field to random string
+            user = {
+                "user_name": userName,
+                "user_id": os.urandom(16).hex(),
+                "organization_name": organizationName
+            }
+            collection.insert_one(user)
+            return user["user_id"]
+            

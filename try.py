@@ -98,10 +98,10 @@ if __name__ == "__main__":
     # print(MongoUtils.queryByPriorityGreaterThan(8))
     # print("Hello")
     # loopForChunkingQueue(deleteMessage=True)
-    print(MongoUtils.queryAllQuestions())
-    # while True:
-    #     inp = input("Enter the text: ")
-    #     print(PineConeIntegration.getRoute(inp))
+    # print(MongoUtils.queryAllQuestions())
+    while True:
+        inp = input("Enter the text: ")
+        print(PineConeIntegration.getRoute(inp))
     
     # text = input("Enter the text: ")
     # print(QuestionGenerator.generateQuestions(text,True))
