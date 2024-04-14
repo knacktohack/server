@@ -18,7 +18,7 @@ azureValue = os.getenv("AZURE_KEY_VALUE")
 
 
 def publishToServiceBusQueue(
-    connectionString: str, queueName: str, message: str | dict
+    connectionString, queueName, message
 ) -> None:
     """
     Publish a message to an Azure Service Bus Queue.
