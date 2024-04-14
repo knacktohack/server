@@ -19,6 +19,13 @@ class InMemoryHistory(BaseChatMessageHistory, BaseModel):
 store = {}
 
 
+def get_all_sessions(user_id: str) -> List[BaseChatMessageHistory]:
+    user_sessions = []
+    for key in store.keys():
+        if key[0] == user_id:
+            user_sessions.append(store[key])
+    return user_sessions
+
 
 def get_session_history(
     user_id: str, conversation_id: str

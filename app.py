@@ -8,7 +8,7 @@ import signal
 from dotenv import load_dotenv
 import requests
 from flask import jsonify
-from core.chatbot import get_session_history, format_session_messages,with_message_history
+from core.chatbot import get_session_history, format_session_messages,get_all_sessions,with_message_history
 import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -174,7 +174,25 @@ def generate_text():
     return jsonify({"response": response.content, "history": "chat_history"})
 
 
-@app.route("/<user_id>/<conversation_id>", methods=["GET"])
+@app.route("/history/<user_id>", methods=["GET"])
+def get_sessions(user_id):
+    try: 
+        
+        if user_id is None :
+            return jsonify({"error": "Missing user_id"}), 400
+        sessions = get_all_sessions(user_id)
+        print(sessions)
+        formatted_sessions = []
+        for session in sessions:
+            formatted_messages=format_session_messages(session.messages)
+            formatted_sessions.append(formatted_messages)
+        response = {"response": formatted_sessions}
+        return jsonify(response)
+     
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/history/<user_id>/<conversation_id>", methods=["GET"])
 def get_text(user_id,conversation_id):
     try: 
         
@@ -268,4 +286,4 @@ def startApp():
     app.run(port=8000)
 
 if __name__ == "__main__":
-    app.run(port=8000)
+    app.run(port=8000,debug=True)
