@@ -570,10 +570,12 @@ class MongoUtils:
         db = client[dbName]
         collection = db[questionCollection]
         document = collection.find_one({"question": questionName})
+
+        try:
+            return document["threshold"]
         
-        if "threshold" not in document:
+        except Exception as e:
             return 0.82
-        return document["threshold"]
     
     @staticmethod
     def queryPotentialViolationById(id):
