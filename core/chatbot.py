@@ -23,7 +23,7 @@ def get_all_sessions(user_id: str) -> List[BaseChatMessageHistory]:
     user_sessions = []
     for key in store.keys():
         if key[0] == user_id:
-            user_sessions.append(store[key])
+            user_sessions.append((key[1],store[key]))
     return user_sessions
 
 

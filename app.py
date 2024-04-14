@@ -184,8 +184,8 @@ def get_sessions(user_id):
         print(sessions)
         formatted_sessions = []
         for session in sessions:
-            formatted_messages=format_session_messages(session.messages)
-            formatted_sessions.append(formatted_messages)
+            formatted_messages=format_session_messages(session[1].messages)
+            formatted_sessions.append({"conversation_id": session[0], "messages" : formatted_messages})
         response = {"response": formatted_sessions}
         return jsonify(response)
      
