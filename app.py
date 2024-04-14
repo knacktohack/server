@@ -315,8 +315,57 @@ def add_question():
 #     except Exception as e:
 #         return jsonify({"error": str(e)}), 500
 
+'''
+    send body as
+    {
+        "question": "question"
+    }
+    
+    or an empty body for no question specific filtering
+'''
+@app.route("/potential_violations", methods=["POST"])
+def get_potential_violations():
+    try:
+        body = request.get_json()
+        
+        if 'question' not in body:
+            return jsonify(MongoUtils.queryAllPotentialViolations())
+        
+        question = body["question"]
+        
+        return jsonify(MongoUtils.queryPotentialViolations(question))
 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    
+'''
+    send body as
+    {
+        "id": id of the potential violation,
+        "accepted": "true" or "false"
+    }
+'''
+    
+@app.route("/handle_potential_violation", methods=["POST"])
+def handle_potential_violation():
+    try:
+        body = request.get_json()
+        id = body["id"]
+        potentialViolation = MongoUtils.queryPotentialViolationById(id)
+        accepted = body["accepted"]
+        
+        if accepted=="true":
+            PineConeIntegration.handlePotentialViolation(potentialViolation,id,accepted=True)
+        else:
+            PineConeIntegration.handlePotentialViolation(potentialViolation,id,accepted=False)
+            
+        return jsonify({"message": "Handled potential violation"})
 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+        
+        
 
 def startApp():
     app.run(port=8000)

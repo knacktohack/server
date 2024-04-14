@@ -108,8 +108,9 @@ if __name__ == "__main__":
     # PineconeClient.deleteAll()
     # MongoUtils.deleteAllQuestions()
     # PineConeIntegration.deleteAll()
-    text = input("Enter the text: ")
-    print(QuestionExtractor.extractQuestions(text))   
+    # text = input("Enter the text: ")
+    # print(QuestionExtractor.extractQuestions(text))   
+    print(MongoUtils.queryPotentialViolationById("661c1e040bb926fdc8312ca9"))
 
 
 # client = MongoClient("mongodb+srv://amartya:6411@cluster0.kvdsk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")

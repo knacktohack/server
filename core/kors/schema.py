@@ -11,7 +11,7 @@ listElement = Object(
         ),
         Number(
             id="priority",
-            description="The priority of the question from 1 to 10. A question with a higher priority is more likely to be asked by a malicious employee",
+            description="The priority of the question from 1 to 10. A question with a higher priority is more likely to cause more damage to the organization if it is violated.",
         ),
     ],
 )
@@ -20,7 +20,6 @@ schema = Object(
     description="""A paragraph of rules or regulations are provided.
     Find the rules in the paragraph pertaining to employee conduct and security.
     Questions are to be generated which would reflect the kinds of questions that would be asked by an employee trying to circumvent or go againt one or more of these rules.
-    You MUST EXTRACT some question, no matter how irrelevant they seem.
     The questions should be generated in an indirect way. NOTE - Consider all aspects in which the rule may be violated.
     Extract a maxiumum of 3 most relevant questions from the paragraph.""",
     attributes=[listElement],
@@ -110,7 +109,7 @@ schema = Object(
                     }
                 ]
             },
-        )
+        ),
     ],
     many=True,
 )

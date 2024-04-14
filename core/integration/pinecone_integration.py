@@ -119,3 +119,15 @@ class PineConeIntegration:
         MongoUtils.deleteQuestionByName(routeName)
         PineconeClient.deleteQuestion(routeName)
         return deleteRoute(routeName)
+    
+    @staticmethod
+    def handlePotentialViolation(potentialViolation,id,accepted=False):
+        if accepted:
+            insertRoute(potentialViolation["question_name"],[potentialViolation["prompt"]])
+            MongoUtils.insertSampleQuestionByQuestionMame(potentialViolation["question_name"],potentialViolation["prompt"])
+        else:
+            pass
+        
+        MongoUtils.deletePotentialViolation(id)
+        return
+        

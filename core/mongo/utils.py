@@ -13,7 +13,7 @@ questionCollection = os.getenv("QUESTION_COLLECTION")
 chatCollection = os.getenv("CHAT_COLLECTION")
 violationCollection = os.getenv("VIOLATION_COLLECTION")
 organizationCollection = os.getenv("ORGANIZATION_COLLECTION")
-potentialViolationsCollection = os.getenv("POTENTIAL_VIOLATIONS_COLLECTION")
+potentialViolationsCollection = os.getenv("POTENTIAL_VIOLATION_COLLECTION")
 
 """
 question is a dictionary with the following keys
@@ -531,7 +531,7 @@ class MongoUtils:
         client = MongoUtils.client
         db = client[dbName]
         collection = db[potentialViolationsCollection]
-        documents = collection.find()
+        documents = collection.find({})
         documents = [document for document in documents]
         documents = removeAndInsertId(documents)
         return list(documents)
@@ -574,3 +574,21 @@ class MongoUtils:
         if "threshold" not in document:
             return 0.82
         return document["threshold"]
+    
+    @staticmethod
+    def queryPotentialViolationById(id):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[potentialViolationsCollection]
+        document   = collection.find_one({"_id": ObjectId(id)})
+        del document["_id"]
+        return document
+    
+    
+    @staticmethod
+    def insertSampleQuestionByQuestionMame(questionName, sampleQuestion):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[questionCollection]
+        result = collection.update_one({"question": questionName}, {"$push": {"sample_questions": sampleQuestion}})
+        return result.modified_count
