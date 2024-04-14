@@ -1,0 +1,4 @@
+from core.integration.pinecone_integration import PineConeIntegration
+from core.azure.message_queue import loopForChunkingQueue
+
+loopForChunkingQueue(deleteMessage=True)
