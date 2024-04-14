@@ -115,7 +115,6 @@ def getResponseFromLLM(prompt,user_id,conversation_id):
         config={"configurable": {"user_id": user_id, "conversation_id": conversation_id}}
     )
     relevantStore= get_session_history(user_id, conversation_id)
-    print(relevantStore.messages)
     answer=relevantStore.messages[-1].content
     # print("-----------relevantStore-=---------")
     # print(relevantStore.messages[-1].content)

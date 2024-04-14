@@ -167,10 +167,9 @@ def generate_text():
     prompt = request.get_json()["prompt"]
     user_id = request.get_json()["user_id"]  # Get user ID from request
     conversation_id=request.get_json()["conversation_id"]
-    # print(type(prompt))
-    # questionName,questionScore=PineConeIntegration.getRoute(prompt)
-    # flag=RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore)
-    flag=False
+    print(type(prompt))
+    questionName,questionScore=PineConeIntegration.getRoute(prompt)
+    flag=RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore)
     if flag:
         session=get_session_history(user_id,conversation_id)
         session.add_user_message(prompt)
@@ -179,8 +178,6 @@ def generate_text():
         
     else:
         response,status=getResponseFromLLM(prompt,user_id,conversation_id)
-        print(response)
-    # print(store)
         return jsonify({"response": response, "history": "chat_history","status":status})
 
 
