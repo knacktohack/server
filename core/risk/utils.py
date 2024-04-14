@@ -27,11 +27,11 @@ class RiskIntegration:
     def alertingService(userId, organizationName="knacktohack"):
         violationsOneDayBefore = (
             MongoUtils.queryViolationsByUserIdAndOrganizationNameAndDateBefore(
-                userId, organizationName, 1
+                userId, 1
             )
         )
         violationsOneWeekBefore = (
             MongoUtils.queryViolationsByUserIdAndOrganizationNameAndDateBefore(
-                userId, organizationName, 7
+                userId, 7
             )
         )
