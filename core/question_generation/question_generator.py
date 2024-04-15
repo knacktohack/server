@@ -37,6 +37,8 @@ class QuestionGenerator:
         
         CONTEXT - {context}
         
+        The question is 
+        
         QUESTION - {original_question}
     """,
        input_variables=["original_question"])

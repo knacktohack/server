@@ -102,6 +102,17 @@ class MongoUtils:
         MongoUtils.insertUserIfNotExists(query["user_id"])
         result = collection.update_one(query, {"$set": update})
         return result.modified_count
+    
+    
+    @staticmethod
+    def queryAll(collectionName):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[collectionName]
+        documents = collection.find({})
+        documents = [document for document in documents]
+        documents = removeAndInsertId(documents)
+        return list(documents)
 
     @staticmethod
     def queryUserIdAndSeverityScoreDescending():

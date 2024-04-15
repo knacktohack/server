@@ -174,13 +174,15 @@ async def query(q: str):
 
 @app.route("/generate", methods=["POST"])
 def generate_text():
+    body = request.get_json()
+    print(body)
     prompt = request.get_json()["prompt"]
     user_id = request.get_json()["user_id"]  # Get user ID from request
     conversation_id=request.get_json()["conversation_id"]
     print(type(prompt))
-    # questionName,questionScore=PineConeIntegration.getRoute(prompt)
-    questionName="Temp"
-    flag=False#RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore,prompt)
+    questionName,questionScore=PineConeIntegration.getRoute(prompt)
+    # questionName="Temp"
+    flag=RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore,prompt)
     if flag:
         session=get_session_history(user_id,conversation_id)
         session.add_user_message(prompt)
@@ -394,7 +396,7 @@ def get_risk():
         
 
 def startApp():
-    app.run(port=8000)
+    app.run(port=8000,debug=True,host="0.0.0.0",use_reloader=False)
 
 if __name__ == "__main__":
     app.run(port=8000,debug=True)

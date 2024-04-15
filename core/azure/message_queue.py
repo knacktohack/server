@@ -86,7 +86,7 @@ def loop(queueName, callback=print,timeInMinutes: int = 0.1,maxMessages=10,delet
     
 
 
-def loopForChunkingQueue(timeInMinutes: int = 2,deleteMessage=False) -> None:
+def loopForChunkingQueue(timeInMinutes: int = 2,deleteMessage=True) -> None:
     """
     Continuously polls the Azure Chunking Queue at a specified interval.
 
@@ -108,4 +108,4 @@ def loopForChunkingQueue(timeInMinutes: int = 2,deleteMessage=False) -> None:
                 for chunk in chunks['chunks']:
                     RagIntegration.addText(chunk)
                 
-    loop(queueName=chunkingQueueName, timeInMinutes=timeInMinutes, deleteMessage=deleteMessage, callback=callback)
+    loop(queueName=chunkingQueueName, timeInMinutes=timeInMinutes, deleteMessage=deleteMessage, callback=print)
