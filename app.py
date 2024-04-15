@@ -199,6 +199,19 @@ def get_violations():
         return jsonify(violations)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+    
+@app.route("/insert_sample_question",methods=["POST"])
+def insert_sample_question():
+    try:
+        body = request.get_json()
+        question = body["question"]
+        sample_question = body['sample_question']
+        
+        PineConeIntegration.insertRoute(question,[sample_question])
+        return jsonify({"message": "Successfully added question"}),200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/history/<user_id>", methods=["GET"])
