@@ -79,7 +79,15 @@ class InMemoryHistory(BaseChatMessageHistory, BaseModel):
  
 store = {}
 
- 
+def clearEmptyChats(user_id: str):
+    keys_to_delete = []
+    for key in store.keys():
+        if key[0] == user_id:
+            if not store[key].messages:
+                keys_to_delete.append(key)
+    for key in keys_to_delete:
+        del store[key]
+
   
 def checkOutputGuard(message):
     output_guard = OutputGuard()
@@ -87,17 +95,19 @@ def checkOutputGuard(message):
     print(result)
     return result
 
-def get_all_sessions(user_id: str) -> List[BaseChatMessageHistory]:
+def get_all_sessions(user_id: str) -> List[dict]:
     user_sessions = []
     for key in store.keys():
         if key[0] == user_id:
-            user_sessions.append((key[1],store[key]))
+            if store[key].messages:
+                user_sessions.append({'conversation_id': key[1], 'title': store[key].messages[0].content})
     return user_sessions
 
 
 def get_session_history(
     user_id: str, conversation_id: str
 ) -> BaseChatMessageHistory:
+    clearEmptyChats(user_id)
     if (user_id, conversation_id) not in store:
         store[(user_id, conversation_id)] = InMemoryHistory()
     return store[(user_id, conversation_id)]

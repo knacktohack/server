@@ -191,23 +191,18 @@ def generate_text():
         return jsonify({"response": response, "history": "chat_history","status":status})
 
 
-# @app.route("/history/<user_id>", methods=["GET"])
-# def get_sessions(user_id):
-#     try: 
+@app.route("/history/<user_id>", methods=["GET"])
+def get_sessions(user_id):
+    try: 
         
-#         if user_id is None :
-#             return jsonify({"error": "Missing user_id"}), 400
-#         sessions = get_all_sessions(user_id)
-#         print(sessions)
-#         formatted_sessions = []
-#         for session in sessions:
-#             formatted_messages=format_session_messages(session[1].messages)
-#             formatted_sessions.append({"conversation_id": session[0], "messages" : formatted_messages})
-#         response = {"response": formatted_sessions}
-#         return jsonify(response)
+        if user_id is None :
+            return jsonify({"error": "Missing user_id"}), 400
+        sessions = get_all_sessions(user_id)
+        response = {"response": sessions}
+        return jsonify(response)
      
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
 @app.route("/history/<user_id>/<conversation_id>", methods=["GET"])
 def get_text(user_id,conversation_id):
