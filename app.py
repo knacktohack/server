@@ -201,7 +201,7 @@ def get_violations():
         return jsonify({"error": str(e)}), 500
     
     
-@app.route("/insert_sample_question",methods=["POST"])
+@app.route("/sample_question",methods=["POST"])
 def insert_sample_question():
     try:
         body = request.get_json()
