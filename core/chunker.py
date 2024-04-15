@@ -1,4 +1,5 @@
 from .common_imports import *
+import string
 def getChunks(text:str) -> list[str]:
   return text.split("\n")
 
@@ -25,9 +26,8 @@ def get_pdf_chunks_from_url(path,chunk_size=4000,chunk_overlap=20):
             }
 
 def clean_text(doc):
-    nlp = spacy.load("en_core_web_sm")  # Loading spaCy NLP model
-    doc = nlp(doc.lower())
-    cleaned_text = " ".join([token.text for token in doc if not token.is_punct])
+    #remove punctuation
+    cleaned_text = doc.translate(str.maketrans('', '', string.punctuation))
     return cleaned_text
 
 

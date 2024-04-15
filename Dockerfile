@@ -9,8 +9,8 @@ EXPOSE 8000/tcp
 WORKDIR /app
 
 # Copy the dependencies file to the working directory
-COPY requirements.txt .
-RUN pip3 install -r requirements.txt
+COPY requirements2.txt .
+RUN pip3 install -r requirements2.txt
 
 COPY core ./core
 COPY app.py .

@@ -120,8 +120,6 @@ nltk==3.8.1
 numexpr==2.10.0
 numpy==1.26.4
 omegaconf==2.3.0
-onnx==1.16.0
-onnxruntime==1.15.1
 openai==1.16.2
 openapi-schema-pydantic==1.2.4
 opencv-python==4.9.0.80
@@ -203,8 +201,6 @@ tiktoken==0.6.0
 timm==0.9.16
 tokenizers==0.15.2
 toolz==0.12.1
-torch==2.2.2
-torchvision==0.17.2
 tornado==6.4
 tqdm==4.66.2
 traitlets==5.14.2

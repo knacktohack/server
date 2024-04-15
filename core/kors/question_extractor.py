@@ -4,7 +4,6 @@ from langchain.chat_models import ChatOpenAI
 from kor.extraction import create_extraction_chain
 from kor.nodes import Object, Text, Number
 
-import pandas as pd
 from pydantic import BaseModel, Field, validator
 from kor import extract_from_documents, from_pydantic, create_extraction_chain
 
