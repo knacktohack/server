@@ -19,7 +19,7 @@ class RiskIntegration:
             MongoUtils.insertViolation(
                 userId, conversationId, questionName, score, organizationName
             )
-            RiskIntegration.alertingService(userId, organizationName)
+            RiskIntegration.getAggregateSeveriyScore(userId)
             return True
 
         if(threshold - score < DELTA):
@@ -55,5 +55,5 @@ class RiskIntegration:
             aggScore += ele["score"]*ele["violation_priority"]
 
         aggScore = aggScore/len(userViolations)
-        res = MongoUtils.updateDocument("users", {"user_id": userId}, {"severity_score": aggScore})
+        res = MongoUtils.updateUserDocument("users", {"user_id": userId}, {"severity_score": aggScore})
         return aggScore

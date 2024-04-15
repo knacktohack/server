@@ -10,7 +10,7 @@ import requests
 from flask import jsonify
 from core.chatbot import get_session_history, format_session_messages,get_all_sessions,with_message_history,getResponseFromLLM 
 import requests
-from flask import Flask, request, jsonifye
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from core.azure.blob_storage import uploadToBlobStorage,getAllFilesByOrganizationId
 from pymongo import MongoClient
@@ -383,6 +383,13 @@ def handle_potential_violation():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
         
+        
+@app.route("/get_risk", methods=["GET"])
+def get_risk():
+    # try:
+    return jsonify(MongoUtils.queryUserIdAndSeverityScoreDescending())
+    # except Exception as e:
+    #     return jsonify({"error": str(e)}), 500
         
 
 def startApp():

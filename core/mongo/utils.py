@@ -94,6 +94,63 @@ def removeAndInsertId(documents):
 class MongoUtils:
     client = MongoClient(mongoUrl)
 
+    @staticmethod
+    def updateUserDocument(collectionName, query, update):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[collectionName]
+        MongoUtils.insertUserIfNotExists(query["user_id"])
+        result = collection.update_one(query, {"$set": update})
+        return result.modified_count
+
+    @staticmethod
+    def queryUserIdAndSeverityScoreDescending():
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db["users"]
+        documents = collection.find().sort("severity_score", -1)
+
+        documents = [document for document in documents]
+        print(documents)
+        if len(documents) == 0:
+            return []
+        documents = removeAndInsertId(documents)
+        documents = [
+            {
+                "user_id": document["user_id"],
+                "severity_score": (
+                    document["severity_score"] if "severity_score" in document else 0
+                ),
+            }
+            for document in documents
+        ]
+        return list(documents)
+
+    @staticmethod
+    def deleteCollectionData(collectionName):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[collectionName]
+        result = collection.delete_many({})
+        return result.deleted_count
+
+    @staticmethod
+    def upsertDocument(collectionName, query, update):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[collectionName]
+        result = collection.update_one(query, {"$set": update}, upsert=True)
+        return result.modified_count
+
+    @staticmethod
+    def insertUserIfNotExists(userId):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db["users"]
+        document = collection.find_one({"user_id": userId})
+        if document is None:
+            collection.insert_one({"user_id": userId})
+        return document
 
     @staticmethod
     def insertQuestion(question):
@@ -116,18 +173,18 @@ class MongoUtils:
         client = MongoUtils.client
         db = client[dbName]
         collection = db[questionCollection]
-        #return the dict
-        document = collection.find_one({
-            "_id": ObjectId(id)
-        })
+        # return the dict
+        document = collection.find_one({"_id": ObjectId(id)})
         return document
-    
+
     @staticmethod
     def updateQuestionPriorityById(id, priority):
         client = MongoUtils.client
         db = client[dbName]
         collection = db[questionCollection]
-        result = collection.update_one({"_id": ObjectId(id)}, {"$set": {"priority": priority}})
+        result = collection.update_one(
+            {"_id": ObjectId(id)}, {"$set": {"priority": priority}}
+        )
         return result.modified_count
 
     @staticmethod
@@ -156,7 +213,7 @@ class MongoUtils:
         collection = db[questionCollection]
         result = collection.delete_one({"_id": id})
         return result.deleted_count
-    
+
     @staticmethod
     def deleteQuestionByName(question):
         client = MongoUtils.client
@@ -201,7 +258,6 @@ class MongoUtils:
         collection = db[questionCollection]
         documents = collection.find({"priority": {"$gt": priority}})
         return list(documents)
-
 
     @staticmethod
     def queryByPriorityLessThan(priority):
@@ -377,25 +433,25 @@ class MongoUtils:
         collection = db[chatCollection]
         document = collection.find_one({"user_id": userId})
         return document["user_name"]
-    
+
     @staticmethod
     def queryUserByUserId(userId):
         client = MongoUtils.client
         db = client[dbName]
         collection = db[chatCollection]
-        document  = collection.find_one({"user_id": userId})
+        document = collection.find_one({"user_id": userId})
         del document["_id"]
         return document
-    
+
     @staticmethod
     def insertUser(user):
         client = MongoUtils.client
         db = client[dbName]
         collection = db[chatCollection]
-        
+
         if "organization_name" not in user:
             user["organization_name"] = "knacktohack"
-            
+
         result = collection.insert_one(user)
         return result.inserted_id.__str__()
 
@@ -475,7 +531,7 @@ class MongoUtils:
 
     @staticmethod
     def queryViolationsByUserIdAndOrganizationNameAndDateBefore(
-        userId,  days=1,organizationName="knacktohack"
+        userId, days=1, organizationName="knacktohack"
     ):
         client = MongoUtils.client
         db = client[dbName]
@@ -490,7 +546,7 @@ class MongoUtils:
         documents = [document for document in documents]
         documents = removeAndInsertId(documents)
         return list(documents)
-    
+
     @staticmethod
     def queryAllPotentialViolations():
         client = MongoUtils.client
@@ -500,7 +556,7 @@ class MongoUtils:
         documents = [document for document in documents]
         documents = removeAndInsertId(documents)
         return list(documents)
-    
+
     @staticmethod
     def queryPotentialViolations(questionName):
         client = MongoUtils.client
@@ -510,7 +566,7 @@ class MongoUtils:
         documents = [document for document in documents]
         documents = removeAndInsertId(documents)
         return list(documents)
-    
+
     @staticmethod
     def deletePotentialViolation(id):
         client = MongoUtils.client
@@ -518,8 +574,7 @@ class MongoUtils:
         collection = db[potentialViolationsCollection]
         result = collection.delete_one({"_id": ObjectId(id)})
         return result.deleted_count
-    
-    
+
     @staticmethod
     def insertPotentialViolation(potentialViolation):
         client = MongoUtils.client
@@ -527,8 +582,7 @@ class MongoUtils:
         collection = db[potentialViolationsCollection]
         result = collection.insert_one(potentialViolation)
         return result.inserted_id.__str__()
-    
-    
+
     @staticmethod
     def queryQuestionRiskThresholdByQuestionName(questionName):
         client = MongoUtils.client
@@ -538,28 +592,29 @@ class MongoUtils:
 
         try:
             return document["threshold"]
-        
+
         except Exception as e:
             return 0.82
-    
+
     @staticmethod
     def queryPotentialViolationById(id):
         client = MongoUtils.client
         db = client[dbName]
         collection = db[potentialViolationsCollection]
-        document   = collection.find_one({"_id": ObjectId(id)})
+        document = collection.find_one({"_id": ObjectId(id)})
         del document["_id"]
         return document
-    
-    
+
     @staticmethod
     def insertSampleQuestionByQuestionMame(questionName, sampleQuestion):
         client = MongoUtils.client
         db = client[dbName]
         collection = db[questionCollection]
-        result = collection.update_one({"question": questionName}, {"$push": {"sample_questions": sampleQuestion}})
+        result = collection.update_one(
+            {"question": questionName}, {"$push": {"sample_questions": sampleQuestion}}
+        )
         return result.modified_count
-    
+
     @staticmethod
     def queryAllViolations():
         client = MongoUtils.client
