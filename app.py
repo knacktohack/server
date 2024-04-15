@@ -209,6 +209,7 @@ def insert_sample_question():
         sample_question = body['sample_question']
         
         PineConeIntegration.insertRoute(question,[sample_question])
+        MongoUtils.insertSampleQuestionByQuestionMame(question,sample_question)
         return jsonify({"message": "Successfully added question"}),200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
