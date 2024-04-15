@@ -1,5 +1,6 @@
 from .common_imports import *
 import string
+from core.azure.document_extractor import extractFullPageText
 def getChunks(text:str) -> list[str]:
   return text.split("\n")
 
@@ -13,15 +14,11 @@ def getChunksFromFiles(filepath: str, chunk_size=4000, chunk_overlap=20) :
   
 
 def get_pdf_chunks_from_url(path,chunk_size=4000,chunk_overlap=20):
-    loader = OnlinePDFLoader(path)
-    data = loader.load()
-    #preprocess the data
-    cleaned_text=clean_text(data[0].page_content)
+    cleaned_text = extractFullPageText(path)
     chunks=chunk_text(cleaned_text, chunk_size, chunk_overlap)
+    
     return {
         'page_content':cleaned_text,
-        
-        'metadata':data[0].metadata,
         'chunks':[chunk.page_content for chunk in chunks]
             }
 

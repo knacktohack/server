@@ -108,4 +108,4 @@ def loopForChunkingQueue(timeInMinutes: int = 2,deleteMessage=True) -> None:
                 for chunk in chunks['chunks']:
                     RagIntegration.addText(chunk)
                 
-    loop(queueName=chunkingQueueName, timeInMinutes=timeInMinutes, deleteMessage=deleteMessage, callback=print)
+    loop(queueName=chunkingQueueName, timeInMinutes=timeInMinutes, deleteMessage=deleteMessage, callback=callback)
