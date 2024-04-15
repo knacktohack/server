@@ -179,7 +179,7 @@ def generate_text():
     conversation_id=request.get_json()["conversation_id"]
     print(type(prompt))
     # questionName,questionScore=PineConeIntegration.getRoute(prompt)
-    questionName="temp"
+    questionName="Temp"
     flag=False#RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore,prompt)
     if flag:
         session=get_session_history(user_id,conversation_id)

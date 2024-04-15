@@ -19,7 +19,7 @@ class RiskIntegration:
             MongoUtils.insertViolation(
                 userId, conversationId, questionName, score, organizationName
             )
-            RiskIntegration.getAggregateSeveriyScore(userId)
+            RiskIntegration.getAggregateSeverityScore(userId)
             return True
 
         if(threshold - score < DELTA):
@@ -43,17 +43,19 @@ class RiskIntegration:
             )
         )
         
-    def getAggregateSeveriyScore(userId, k=10) -> float:
+    def getAggregateSeverityScore(userId, k=10) -> float:
     # userViolations = MongoUtils.queryDocuments("violations", {"user_id": userId, "date": {"$gt": startDate}})
         db = MongoUtils.client["knacktohack"]
         violations = db["violations"]
         userViolations = violations.find({"user_id": userId}).sort("date", DESCENDING).limit(k)
+        userViolations = [ele for ele in userViolations]
         
         aggScore = 0.0
 
         for ele in userViolations:
-            aggScore += ele["score"]*ele["violation_priority"]
+            aggScore += ele["score"]*float(ele["violation_priority"])
 
         aggScore = aggScore/len(userViolations)
         res = MongoUtils.updateUserDocument("users", {"user_id": userId}, {"severity_score": aggScore})
+        print(res)
         return aggScore
