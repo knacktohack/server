@@ -519,8 +519,8 @@ class MongoUtils:
 
     @staticmethod
     def insertViolation(
-        userId, conversationId, questionName, score, organizationName="knacktohack"
-    ):
+        userId, conversationId, questionName, score, organizationName="knacktohack",
+    prompt="This is a prompt"):
         client = MongoUtils.client
         db = client[dbName]
         collection = db[violationCollection]
@@ -535,6 +535,7 @@ class MongoUtils:
             "violation_priority": priority,
             "date": date.today().__str__(),
             "organization_name": organizationName,
+            "prompt":prompt
         }
 
         result = collection.insert_one(violation)

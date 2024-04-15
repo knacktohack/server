@@ -1,5 +1,3 @@
-import spacy
-from langchain_community.document_loaders import OnlinePDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from typing import List
 

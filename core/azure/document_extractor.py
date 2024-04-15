@@ -1,11 +1,7 @@
 from azure.ai.formrecognizer import DocumentAnalysisClient
 from azure.core.credentials import AzureKeyCredential
 import requests as Requests
-from io import BytesIO
-from PyPDF2 import PdfReader, PdfWriter
 import os
-import base64
-import copy
 
 endpoint = os.getenv("AZURE_DOCUMENT_ENDPOINT")
 accessKey = os.getenv("AZURE_DOCUMENT_ACCESS_KEY")

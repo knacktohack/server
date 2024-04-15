@@ -17,7 +17,7 @@ class RiskIntegration:
         threshold = MongoUtils.queryQuestionRiskThresholdByQuestionName(questionName)
         if RiskIntegration.isRisky(threshold,score):
             MongoUtils.insertViolation(
-                userId, conversationId, questionName, score, organizationName
+                userId, conversationId, questionName, score, organizationName,prompt
             )
             RiskIntegration.getAggregateSeverityScore(userId)
             return True

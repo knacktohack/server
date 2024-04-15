@@ -1,5 +1,5 @@
 from kor.nodes import Object, Text, Number
-from pydantic import BaseModel, Field, validator
+
 
 listElement = Object(
     id="listElement",

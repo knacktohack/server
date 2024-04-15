@@ -1,7 +1,13 @@
 # Set base image (host OS)
-FROM --platform=linux/amd64 python:3.9-alpine
-RUN apk update && \
-    apk add --no-cache gfortran musl-dev g++ gcc libxslt-dev libxml2-dev libffi-dev openssl-dev libgcc libstdc++ 
+FROM --platform=linux/amd64 python:3.11-alpine
+RUN apk add --no-cache --update \
+    python3 python3-dev gcc \
+    gfortran musl-dev g++ \
+    libffi-dev openssl-dev \
+    libxml2 libxml2-dev \
+    libxslt libxslt-dev \
+    libjpeg-turbo-dev zlib-dev \
+    linux-headers
 # By default, listen on port 8000
 EXPOSE 8000/tcp
 
@@ -10,7 +16,9 @@ WORKDIR /app
 
 # Copy the dependencies file to the working directory
 COPY requirements2.txt .
-RUN pip3 install -r requirements2.txt
+# RUN pip install --upgrade pip
+# RUN pip install --upgrade cython
+RUN pip install  --no-cache-dir -r requirements2.txt
 
 COPY core ./core
 COPY app.py .
