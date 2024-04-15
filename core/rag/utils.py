@@ -32,3 +32,12 @@ class RagIntegration:
     def addDocumentWithUrl(pdfUrl: str):
         chunks = getChunksFromFiles(pdfUrl,chunk_size=2000)
         return RagIntegration.vectorStore.add_texts(chunks['chunks'])
+    
+    
+    @staticmethod
+    def regenerateVectorStore():
+        RagIntegration.vectorStore = PineconeVectorStore(
+            index_name=os.getenv("PINECONE_INDEX_NAME"),
+            embedding=embeddings
+        )
+        return

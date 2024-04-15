@@ -32,12 +32,10 @@ frontendPort = "http://localhost:3000"
 
 CORS(app, resources={r"/*": {"origins": frontendPort}})
 
-user_id = "12345"
-
 
 @app.get("/")
-async def ping():
-    return {"message": "Server is Live"}
+def ping():
+    return jsonify({"message": "pong"})
 
 @app.route("/upload_rules", methods=["POST"])
 def uploadRulesToBlobStorage():
@@ -382,10 +380,10 @@ def handle_potential_violation():
         
 @app.route("/get_risk", methods=["GET"])
 def get_risk():
-    # try:
-    return jsonify(MongoUtils.queryUserIdAndSeverityScoreDescending())
-    # except Exception as e:
-    #     return jsonify({"error": str(e)}), 500
+    try:
+        return jsonify(MongoUtils.queryUserIdAndSeverityScoreDescending()),200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
         
 
 def startApp():

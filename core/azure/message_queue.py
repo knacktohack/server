@@ -107,5 +107,7 @@ def loopForChunkingQueue(timeInMinutes: int = 2,deleteMessage=True) -> None:
                 chunks = getChunksFromFiles(message['url'],chunk_size=500)
                 for chunk in chunks['chunks']:
                     RagIntegration.addText(chunk)
+                    
+                RagIntegration.regenerateVectorStore()
                 
     loop(queueName=chunkingQueueName, timeInMinutes=timeInMinutes, deleteMessage=deleteMessage, callback=callback)

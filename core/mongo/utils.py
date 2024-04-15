@@ -14,7 +14,7 @@ chatCollection = os.getenv("CHAT_COLLECTION")
 violationCollection = os.getenv("VIOLATION_COLLECTION")
 organizationCollection = os.getenv("ORGANIZATION_COLLECTION")
 potentialViolationsCollection = os.getenv("POTENTIAL_VIOLATION_COLLECTION")
-
+print(organizationCollection)
 """
 question is a dictionary with the following keys
 {
@@ -143,6 +143,15 @@ class MongoUtils:
         db = client[dbName]
         collection = db[collectionName]
         result = collection.delete_many({})
+        return result.deleted_count
+    
+    
+    @staticmethod
+    def deleteFromCollectionById(collectionName, id):
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[collectionName]
+        result = collection.delete_one({"_id": ObjectId(id)})
         return result.deleted_count
 
     @staticmethod
