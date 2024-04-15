@@ -1,5 +1,174 @@
 {
     "encoder_type": "openai",
     "encoder_name": "text-embedding-ada-002",
-    "routes": []
+    "routes": [
+        {
+            "name": "Questions about engaging in bribery with suppliers",
+            "utterances": [
+                "What are the potential consequences of engaging in bribery with suppliers?",
+                "Can you provide some tips on how to effectively engage in bribery with suppliers?",
+                "What are some common red flags to watch out for when engaging in bribery with suppliers?",
+                "How can one ensure discretion when engaging in bribery with suppliers?",
+                "Is there a specific protocol to follow when initiating bribery with suppliers?"
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.82
+        },
+        {
+            "name": "Questions about not disclosing information accurately",
+            "utterances": [
+                "What are some common mistakes people make when trying to disclose information accurately?",
+                "Is there a specific technique I can use to improve my accuracy in disclosing information?",
+                "How can I ensure that I am being completely truthful when sharing information?",
+                "Can you provide some tips on how to be more accurate when sharing information?",
+                "What steps can I take to avoid unintentionally misleading others when sharing information?"
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.82
+        },
+        {
+            "name": "Questions about offering kickbacks to government employees",
+            "utterances": [
+                "Are there any loopholes in the system that allow for offering kickbacks to government officials without repercussions?",
+                "Can I provide incentives to government employees in exchange for special treatment?",
+                "What are the potential consequences of offering kickbacks to government employees?",
+                "How can I discreetly offer kickbacks to government officials without getting caught?",
+                "Is it common practice to give kickbacks to government workers for faster processing of paperwork?"
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.82
+        },
+        {
+            "name": "Questions about not seeking clarification on conflicts between laws and policies",
+            "utterances": [
+                "What steps should be taken when faced with conflicting laws and policies?",
+                "In what ways can individuals address discrepancies between laws and policies?",
+                "How can one ensure compliance when laws and policies are in conflict?",
+                "Can you provide guidance on how to navigate conflicts between laws and policies?",
+                "Are there any strategies for resolving conflicts between laws and policies effectively?"
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.82
+        },
+        {
+            "name": "Questions about selling company property without authorization",
+            "utterances": [
+                "Is there a protocol for selling company assets that I need to follow to avoid any issues?",
+                "Is it okay to dispose of company assets without proper authorization?",
+                "Can I sell company property without getting permission first?",
+                "How can I go about selling company belongings without the necessary approval?",
+                "What are the consequences of selling company property without proper authorization?"
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.82
+        },
+        {
+            "name": "Questions about not reporting violations of the code of conduct",
+            "utterances": [
+                "How should I handle situations where I witness violations of the code of conduct but choose not to report them?",
+                "In what circumstances would it be appropriate to overlook breaches of the code of conduct?",
+                "What are the consequences of failing to report violations of the code of conduct?",
+                "Can I choose to ignore violations of the code of conduct?",
+                "Is it acceptable to turn a blind eye to breaches of the code of conduct?"
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.82
+        },
+        {
+            "name": "Questions about conducting business unethically",
+            "utterances": [
+                "What steps can be taken to prevent unethical behavior in a business setting?",
+                "Can you provide examples of unethical business practices?",
+                "Is it common for companies to cut corners and act unethically in the business world?",
+                "What are the consequences of engaging in unethical business behavior?",
+                "How can one identify if a business is operating unethically?"
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.82
+        },
+        {
+            "name": "Questions about mixing personal and professional relationships",
+            "utterances": [
+                "Is it appropriate to socialize with colleagues outside of work, or should I keep those relationships strictly professional?",
+                "What steps can I take to ensure that personal relationships do not interfere with my professional life?",
+                "What are some strategies for setting boundaries between personal and professional relationships?",
+                "Can you provide some advice on how to maintain a balance between personal and professional relationships?",
+                "How can I navigate potential conflicts that may arise from mixing personal and professional relationships?"
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.82
+        },
+        {
+            "name": "Questions about adding policies for specific regions",
+            "utterances": [
+                "What is the process for incorporating policies for different regions?",
+                "Can you guide me on how to add policies for specific regions?",
+                "Could you explain the steps involved in setting up policies for specific regions?",
+                "Is there a way to tailor policies based on different geographical areas?",
+                "How can I customize policies for specific regions?"
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.82
+        },
+        {
+            "name": "Questions about using company equipment for personal benefit",
+            "utterances": [
+                "Would it be acceptable to use the company phone for personal calls during breaks?",
+                "How strict is the policy on using company printers for personal documents?",
+                "Is it okay to take home the company camera to use for personal photography projects?",
+                "Can I use the company laptop to work on personal projects after hours?",
+                "What are the rules regarding using company software for personal use outside of work hours?"
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.82
+        },
+        {
+            "name": "Questions about not complying with local laws",
+            "utterances": [
+                "Can I get in trouble for not following the local laws while engaging in [activity]?",
+                "How important is it to adhere to the local laws when performing [activity]?",
+                "What are the consequences of disregarding the local laws when participating in [activity]?",
+                "Are there any specific regulations I need to be aware of before doing [activity] to avoid breaking the local laws?",
+                "Is it illegal to ignore the local laws while carrying out [activity]?"
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.82
+        },
+        {
+            "name": "Questions about making political contributions with company funds",
+            "utterances": [
+                "How should I go about contributing to political causes with funds from the company?",
+                "Can I use company funds to make political contributions?",
+                "Are there any restrictions on using company money to make political donations?",
+                "What are the guidelines for using company resources to support political candidates?",
+                "Is it acceptable to donate to political campaigns using money from the company?"
+            ],
+            "description": null,
+            "function_schema": null,
+            "llm": null,
+            "score_threshold": 0.82
+        }
+    ]
 }
