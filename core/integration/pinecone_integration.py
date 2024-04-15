@@ -107,6 +107,9 @@ class PineConeIntegration:
             PineConeIntegration.routeLayer = PineConeIntegration.generateRouteLayer()
         vector = PineConeIntegration.routeLayer._encode(text)
         route, score = PineConeIntegration.routeLayer._retrieve_top_route(vector=vector)
+        
+        if route  is None:
+            return "No Route Found", 0
         return route.name, max(score)
 
     @staticmethod

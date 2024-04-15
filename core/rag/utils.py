@@ -35,6 +35,11 @@ class RagIntegration:
     
     
     @staticmethod
+    def deleteAllVectors():
+        return RagIntegration.vectorStore.delete(delete_all=True)
+    
+    
+    @staticmethod
     def regenerateVectorStore():
         RagIntegration.vectorStore = PineconeVectorStore(
             index_name=os.getenv("PINECONE_INDEX_NAME"),
