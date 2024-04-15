@@ -559,3 +559,13 @@ class MongoUtils:
         collection = db[questionCollection]
         result = collection.update_one({"question": questionName}, {"$push": {"sample_questions": sampleQuestion}})
         return result.modified_count
+    
+    @staticmethod
+    def queryAllViolations():
+        client = MongoUtils.client
+        db = client[dbName]
+        collection = db[violationCollection]
+        documents = collection.find({})
+        documents = [document for document in documents]
+        documents = removeAndInsertId(documents)
+        return list(documents)

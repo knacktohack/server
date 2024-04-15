@@ -10,7 +10,7 @@ import requests
 from flask import jsonify
 from core.chatbot import get_session_history, format_session_messages,get_all_sessions,with_message_history,getResponseFromLLM 
 import requests
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonifye
 from flask_cors import CORS
 from core.azure.blob_storage import uploadToBlobStorage,getAllFilesByOrganizationId
 from pymongo import MongoClient
@@ -178,8 +178,9 @@ def generate_text():
     user_id = request.get_json()["user_id"]  # Get user ID from request
     conversation_id=request.get_json()["conversation_id"]
     print(type(prompt))
-    questionName,questionScore=PineConeIntegration.getRoute(prompt)
-    flag=RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore,prompt)
+    # questionName,questionScore=PineConeIntegration.getRoute(prompt)
+    questionName="temp"
+    flag=False#RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore,prompt)
     if flag:
         session=get_session_history(user_id,conversation_id)
         session.add_user_message(prompt)
@@ -189,6 +190,15 @@ def generate_text():
     else:
         response,status=getResponseFromLLM(prompt,user_id,conversation_id)
         return jsonify({"response": response, "history": "chat_history","status":status})
+    
+    
+@app.route("/get_violations", methods=["GET"])
+def get_violations():
+    try:
+        violations = MongoUtils.queryAllViolations()
+        return jsonify(violations)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/history/<user_id>", methods=["GET"])

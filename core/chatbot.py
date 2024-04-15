@@ -136,22 +136,25 @@ prompt = ChatPromptTemplate.from_messages(
         (
             "system",
             """You are a helpful assistant. Answer all questions to the best of your ability. Use the context given below
-            {context}
+            CONTEXT - {context}
             """,
         ),
         
         MessagesPlaceholder(variable_name="history"),
-        ("human", "{question}"),
+        ("human", "Question - {question}"),
     ]
 )
 
 
 
-retriever=RagIntegration.getRetriever()
+retriever=RagIntegration.getChatRetriever()
 
 print(type(retriever))
 print(retriever)
-# chain =({"context":retriever,"question": RunnablePassthrough()}  | prompt  | chat)
+def formatDocs(docs):
+    return "\n\n".join([d.page_content for d in docs])
+
+# chain =({"context":retriever | formatDocs,"question": RunnablePassthrough()}  | prompt  | chat)
 chain =( prompt  | chat)
 
 with_message_history = RunnableWithMessageHistory(
