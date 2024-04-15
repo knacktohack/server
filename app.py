@@ -1,19 +1,12 @@
-import os
+
 # import requests
-from pydantic import BaseModel
 from typing import List
-import uvicorn
-import json
-import signal
 from dotenv import load_dotenv
-import requests
 from flask import jsonify
 from core.chatbot import get_session_history, format_session_messages,get_all_sessions,with_message_history,getResponseFromLLM 
-import requests
 from flask import Flask, request
 from flask_cors import CORS
 from core.azure.blob_storage import uploadToBlobStorage,getAllFilesByOrganizationId
-from pymongo import MongoClient
 from core.mongo.utils import MongoUtils
 from core.integration.pinecone_integration import PineConeIntegration
 from core.MessageTypes import MessageTypes
