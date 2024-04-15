@@ -105,6 +105,7 @@ class PineConeIntegration:
     def getRoute(text: str):
         if PineConeIntegration.routeLayer is None:
             PineConeIntegration.routeLayer = PineConeIntegration.generateRouteLayer()
+            PineConeIntegration.routeLayer.to_json("route_layer.json")
         vector = PineConeIntegration.routeLayer._encode(text)
         route, score = PineConeIntegration.routeLayer._retrieve_top_route(vector=vector)
         

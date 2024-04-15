@@ -1,0 +1,5 @@
+{
+    "encoder_type": "openai",
+    "encoder_name": "text-embedding-ada-002",
+    "routes": []
+}
