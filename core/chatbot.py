@@ -87,6 +87,10 @@ def clearEmptyChats(user_id: str):
                 keys_to_delete.append(key)
     for key in keys_to_delete:
         del store[key]
+        
+        
+def clearStore():
+    store.clear()
 
   
 def checkOutputGuard(message):

@@ -3,7 +3,8 @@
 from typing import List
 from dotenv import load_dotenv
 from flask import jsonify
-from core.chatbot import get_session_history, format_session_messages,get_all_sessions,with_message_history,getResponseFromLLM 
+import os
+from core.chatbot import get_session_history, format_session_messages,get_all_sessions,with_message_history,getResponseFromLLM,clearStore
 from flask import Flask, request
 from flask_cors import CORS
 from core.azure.blob_storage import uploadToBlobStorage,getAllFilesByOrganizationId
@@ -28,9 +29,11 @@ app = Flask(__name__)
 #     allow_headers=["*"],
 # )
 
-frontendPort = "http://localhost:3000"
+frontendPort = "https://mojo-gpt.vercel.app"
 
 CORS(app, resources={r"/*": {"origins": frontendPort}})
+
+deploy = os.getenv("DEPLOY")
 
 
 @app.get("/")
@@ -41,6 +44,8 @@ def ping():
 def uploadRulesToBlobStorage():
     try:
         # Get uploaded file from form data
+        if(deploy=="false"):
+            return jsonify({"message": "This route is not enabled"}), 200
         uploadedFile = request.files.get("file")
         organization = "knacktohack"
         if "organization" in request.form:
@@ -69,6 +74,8 @@ def uploadRulesToBlobStorage():
 def uploadCompanyDataToBlobStorage():
     try:
         # Get uploaded file from form data
+        if(deploy=="false"):
+            return jsonify({"message": "This route is not enabled"}), 200
         uploadedFile = request.files.get("file")
         organization = "knacktohack"
         if "organization" in request.form:
@@ -170,6 +177,9 @@ def generate_text():
         body = request.get_json()
         print(body)
         prompt = request.get_json()["prompt"]
+        
+        if len(prompt)>500:
+            return jsonify({"response": "Text too long, please shorten it", "history": "chat_history","status":400})
         user_id = request.get_json()["user_id"]  # Get user ID from request
         conversation_id=request.get_json()["conversation_id"]
         print(type(prompt))
@@ -205,6 +215,8 @@ def get_violations():
 @app.route("/sample_question",methods=["POST"])
 def insert_sample_question():
     try:
+        if(deploy=="false"):
+            return jsonify({"message": "This route is not enabled"}), 200
         body = request.get_json()
         question = body["question"]
         sample_question = body['sample_question']
@@ -317,6 +329,8 @@ def update_question():
 @app.route("/rules_add", methods=["POST"])
 def add_question():
     try:
+        if(deploy=="false"):
+            return jsonify({"message": "This route is not enabled"}), 200
         body = request.get_json()
         question = body["rule"]
         print(question)
@@ -404,6 +418,15 @@ def get_risk():
         print(e)
         return jsonify({"error": str(e)}), 500
         
+@app.route("/admin_clear_chat", methods=["GET"])
+def admin_clear_chat():
+    try:
+        clearStore()
+    
+        return jsonify({"message": "Successfully cleared chat"}),200
+    except Exception as e:
+        print(e)
+        return jsonify({"error": str(e)}), 500
 
 def startApp():
     app.run(port=8000,debug=True,host="0.0.0.0",use_reloader=False)
