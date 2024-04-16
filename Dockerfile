@@ -1,5 +1,5 @@
 # Set base image (host OS)
-FROM --platform=linux/amd64 python:3.9-alpine
+FROM --platform=linux/amd64 python:3.11-alpine
 RUN apk add --no-cache --update \
     python3 python3-dev gcc \
     gfortran musl-dev g++ \
@@ -16,9 +16,9 @@ WORKDIR /app
 
 # Copy the dependencies file to the working directory
 COPY requirements2.txt .
-# RUN pip install --upgrade pip
+RUN pip3 install --upgrade pip
 # RUN pip install --upgrade cython
-RUN pip install  --no-cache-dir -r requirements2.txt
+RUN pip3 install -r requirements2.txt
 
 COPY core ./core
 COPY app.py .

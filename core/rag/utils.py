@@ -10,6 +10,7 @@ embeddings = OpenAIEmbeddings(
     openai_api_key=os.getenv("OPENAI_API_KEY")
 )
 
+print("Rag key", os.getenv("RAG_API_KEY"))
 class RagIntegration:
     vectorStore = PineconeVectorStore(
         index_name=os.getenv("PINECONE_INDEX_NAME"),

@@ -8,7 +8,6 @@ from core.rag.utils import RagIntegration
 print(MongoUtils.queryAll("users"))
 # print(MongoUtils.deleteCollectionData("violations"))
 # loopForChunkingQueue(deleteMessage=True)
-# data = extractFullPageText("https://knacktohackstorage.blob.core.windows.net/chunked/DATA_661d21dfb902850d25983697/InsiderTradingandIndianStockMarket.pdf")
 
 # #write into a txt file
 # with open("test.txt", "w") as f:
