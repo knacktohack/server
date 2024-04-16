@@ -146,6 +146,7 @@ def delete_question():
         PineConeIntegration.deleteRoute(question)
         return jsonify({"message": "Successfully deleted question"}),200
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
         
 
@@ -165,24 +166,30 @@ async def query(q: str):
 
 @app.route("/generate", methods=["POST"])
 def generate_text():
-    body = request.get_json()
-    print(body)
-    prompt = request.get_json()["prompt"]
-    user_id = request.get_json()["user_id"]  # Get user ID from request
-    conversation_id=request.get_json()["conversation_id"]
-    print(type(prompt))
-    questionName,questionScore=PineConeIntegration.getRoute(prompt)
-    # questionName="Temp"
-    flag=RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore,prompt)
-    if flag:
-        session=get_session_history(user_id,conversation_id)
-        session.add_user_message(prompt)
-        session.add_ai_message(questionName+"flagged")
-        return jsonify({"response": "Sorry this question is blocked as I cannot answer "+questionName, "history": "chat_history","status":400})
+    try:
+        body = request.get_json()
+        print(body)
+        prompt = request.get_json()["prompt"]
+        user_id = request.get_json()["user_id"]  # Get user ID from request
+        conversation_id=request.get_json()["conversation_id"]
+        print(type(prompt))
+        questionName,questionScore=PineConeIntegration.getRoute(prompt)
+        # questionName="Temp"
+        flag=RiskIntegration.persistRisk(user_id,conversation_id,questionName,questionScore,prompt)
+        if flag:
+            session=get_session_history(user_id,conversation_id)
+            session.add_user_message(prompt)
+            temp = "Sorry this question is blocked as I cannot answer "+questionName
+            session.add_ai_message(temp+" :Flagged")
+            return jsonify({"response": temp, "history": "chat_history","status":400})
+            
+        else:
+            response,status=getResponseFromLLM(prompt,user_id,conversation_id)
+            return jsonify({"response": response, "history": "chat_history","status":status})
         
-    else:
-        response,status=getResponseFromLLM(prompt,user_id,conversation_id)
-        return jsonify({"response": response, "history": "chat_history","status":status})
+    except Exception as e:
+        print(e)
+        return jsonify({"error": str(e)}), 500
     
     
 @app.route("/get_violations", methods=["GET"])
@@ -191,6 +198,7 @@ def get_violations():
         violations = MongoUtils.queryAllViolations()
         return jsonify(violations)
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
     
     
@@ -205,6 +213,7 @@ def insert_sample_question():
         MongoUtils.insertSampleQuestionByQuestionMame(question,sample_question)
         return jsonify({"message": "Successfully added question"}),200
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
 
 
@@ -219,6 +228,7 @@ def get_sessions(user_id):
         return jsonify(response)
      
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
     
 @app.route("/history/<user_id>/<conversation_id>", methods=["GET"])
@@ -234,6 +244,7 @@ def get_text(user_id,conversation_id):
         return jsonify(response)
      
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
     
     
@@ -243,6 +254,7 @@ def insert_question_sample():
         questionId = request.get_json()["id"]
         
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
 
 @app.route("/questions", methods=["POST"])
@@ -263,6 +275,7 @@ def get_question():
         return jsonify(questions)
      
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
     
     
@@ -284,6 +297,7 @@ def insert_question():
         MongoUtils.insertQuestion(question)
      
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
     
 @app.route("/questions_update", methods=["PUT", "PATCH"])
@@ -296,6 +310,7 @@ def update_question():
         return jsonify({"message": f"Updated record"})
     
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
 
 
@@ -310,6 +325,7 @@ def add_question():
         return jsonify(questions)
     
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
     
      
@@ -348,6 +364,7 @@ def get_potential_violations():
         return jsonify(MongoUtils.queryPotentialViolations(question))
 
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
     
     
@@ -375,6 +392,7 @@ def handle_potential_violation():
         return jsonify({"message": "Handled potential violation"})
 
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
         
         
@@ -383,6 +401,7 @@ def get_risk():
     try:
         return jsonify(MongoUtils.queryUserIdAndSeverityScoreDescending()),200
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
         
 

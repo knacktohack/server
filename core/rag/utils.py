@@ -13,7 +13,8 @@ embeddings = OpenAIEmbeddings(
 class RagIntegration:
     vectorStore = PineconeVectorStore(
         index_name=os.getenv("PINECONE_INDEX_NAME"),
-        embedding=embeddings
+        embedding=embeddings,
+        pinecone_api_key=os.getenv("RAG_API_KEY")
     )
     
     @staticmethod
@@ -26,7 +27,7 @@ class RagIntegration:
     
     @staticmethod
     def getChatRetriever():
-        return RagIntegration.vectorStore.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": 0.75,"k":5})
+        return RagIntegration.vectorStore.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": 0.8,"k":3})
     
     @staticmethod
     def addDocumentWithUrl(pdfUrl: str):
@@ -43,6 +44,7 @@ class RagIntegration:
     def regenerateVectorStore():
         RagIntegration.vectorStore = PineconeVectorStore(
             index_name=os.getenv("PINECONE_INDEX_NAME"),
-            embedding=embeddings
+            embedding=embeddings,
+            pinecone_api_key=os.getenv("RAG_API_KEY")
         )
         return

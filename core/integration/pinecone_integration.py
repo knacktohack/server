@@ -16,7 +16,12 @@ encoder = OpenAIEncoder(openai_api_key=os.getenv("OPENAI_API_KEY"))
 
 
 class PineConeIntegration:
-    index = returnIndex()
+    try:
+        index = returnIndex()
+        
+    except Exception as e:
+        print(e)
+        index = RouteLayer.from_json("route_layer.json")
 
     # routes_dict = {}
     # for route, utterance in index.get_routes():
@@ -104,8 +109,12 @@ class PineConeIntegration:
     @staticmethod
     def getRoute(text: str):
         if PineConeIntegration.routeLayer is None:
-            PineConeIntegration.routeLayer = RouteLayer.from_json("route_layer.json")#PineConeIntegration.generateRouteLayer()
+            try:
+                PineConeIntegration.routeLayer = PineConeIntegration.generateRouteLayer()
             # PineConeIntegration.routeLayer.to_json("route_layer.json")
+            except Exception as e:
+                print(e)
+                PineConeIntegration.routeLayer = RouteLayer.from_json("route_layer.json")
         vector = PineConeIntegration.routeLayer._encode(text)
         route, score = PineConeIntegration.routeLayer._retrieve_top_route(vector=vector)
         
@@ -115,23 +124,39 @@ class PineConeIntegration:
 
     @staticmethod
     def insertRoute(routeName, utterances):
-        insertRoute(routeName, utterances)
-        PineConeIntegration.routeLayer = PineConeIntegration.generateRouteLayer()
+        try:
+            insertRoute(routeName, utterances)
+            PineConeIntegration.routeLayer = PineConeIntegration.generateRouteLayer()
+            
+        except Exception as e:
+            print(e)
+            return
+        
 
     @staticmethod
     def deleteRoute(routeName):
-        MongoUtils.deleteQuestionByName(routeName)
-        PineconeClient.deleteQuestion(routeName)
-        return deleteRoute(routeName)
+        try:
+            MongoUtils.deleteQuestionByName(routeName)
+            PineconeClient.deleteQuestion(routeName)
+            return deleteRoute(routeName)
+        
+        except Exception as e:
+            MongoUtils.deleteQuestionByName(routeName)
+            PineconeClient.deleteQuestion(routeName)
+            return
     
     @staticmethod
     def handlePotentialViolation(potentialViolation,id,accepted=False):
-        if accepted:
-            insertRoute(potentialViolation["question_name"],[potentialViolation["prompt"]])
-            MongoUtils.insertSampleQuestionByQuestionMame(potentialViolation["question_name"],potentialViolation["prompt"])
-        else:
-            pass
+        try:
+            if accepted:
+                insertRoute(potentialViolation["question_name"],[potentialViolation["prompt"]])
+                MongoUtils.insertSampleQuestionByQuestionMame(potentialViolation["question_name"],potentialViolation["prompt"])
+            else:
+                pass
+            
+            MongoUtils.deletePotentialViolation(id)
+            return
         
-        MongoUtils.deletePotentialViolation(id)
-        return
-        
+        except Exception as e:
+            print(e)
+            return

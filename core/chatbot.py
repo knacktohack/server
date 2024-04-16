@@ -187,8 +187,11 @@ def format_docs(docs):
   
 
 def getResponseFromLLM(prompt,user_id,conversation_id):
+    context = retriever.get_relevant_documents(prompt)
+    print(context) 
+    context = format_docs(context)
     response=with_message_history.invoke(
-        { "question": prompt,"context":retriever | format_docs},
+        { "question": prompt,"context":context},
         config={"configurable": {"user_id": user_id, "conversation_id": conversation_id}}
     )
     relevantStore= get_session_history(user_id, conversation_id)
